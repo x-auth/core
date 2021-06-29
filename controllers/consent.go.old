@@ -1,0 +1,97 @@
+package controllers
+
+import (
+	"github.com/gorilla/csrf"
+	"github.com/ory/hydra-client-go/client/admin"
+	"github.com/ory/hydra-client-go/models"
+	"html/template"
+	"net/http"
+	"nictec.net/auth/authenticators"
+	"nictec.net/auth/helpers"
+)
+
+func ConsentOld(w http.ResponseWriter, request *http.Request){
+	hydraAdmin := getAdmin()
+	if request.Method == http.MethodPost{
+		// parse the form
+		request.ParseForm()
+		// get the challenge
+		challenge := request.FormValue("challenge")
+
+		// fetch the request
+		requestParams := &admin.GetConsentRequestParams{ConsentChallenge: challenge}
+		consentRequest, err := hydraAdmin.GetConsentRequest(requestParams)
+		if err != nil{
+			helpers.Error(w, 500, "Error getting consent request: " + err.Error())
+		}
+		body := consentRequest.GetPayload()
+
+		// check if the user denied or gives the consent
+		if (request.FormValue("submit") == "Deny access"){
+			helpers.RejectConsentRequest(hydraAdmin, challenge)
+		}
+
+		session := models.ConsentRequestSession{}
+		// TODO: manage grantScope
+		println(request.FormValue("grantScope"))
+
+		// set session
+		authenticator := helpers.GetCookie(request, "authenticator")
+		profile := authenticators.GetProfile(authenticator, body.Subject)
+		session.IDToken = profile
+
+		acceptConsentRequest := models.AcceptConsentRequest{
+			GrantAccessTokenAudience: body.RequestedAccessTokenAudience,
+			GrantScope: body.RequestedScope,
+		}
+		acceptParams := &admin.AcceptConsentRequestParams{Body: &acceptConsentRequest, ConsentChallenge: challenge}
+		consentResponse, err := hydraAdmin.AcceptConsentRequest(acceptParams)
+		if err != nil {
+			helpers.Error(w, 500, "Error accepting consent request: " + err.Error())
+		}
+
+		http.Redirect(w, request, *consentResponse.GetPayload().RedirectTo, 307)
+	} else {
+		query := request.URL.Query()
+
+		// the challenge is used to fetch information from hydra
+		challenge_list := query["challenge"]
+		var challenge string
+		if len(challenge_list) == 0{
+			helpers.Error(w, 400, "Expected a login challenge but received none")
+			return
+		} else {
+			challenge = challenge_list[0]
+		}
+
+		// This section processes consent requests and either shows the consent UI or
+		// accepts the consent request right away if the user has given consent to this
+		// app before
+		requestParams := &admin.GetConsentRequestParams{ConsentChallenge: challenge}
+		consentRequest, err := hydraAdmin.GetConsentRequest(requestParams)
+		if err != nil{
+			helpers.Error(w, 500, "Error getting consent request: " + err.Error())
+			return
+		}
+		body := consentRequest.GetPayload()
+
+		// skip if consent is already given
+		if body.Skip{
+			consentResponse, err := helpers.AcceptConsentRequest(hydraAdmin, challenge, *body)
+			if err != nil {
+				helpers.Error(w, 500, "Error accepting consent request: " + err.Error())
+			}
+			http.Redirect(w, request, *consentResponse.GetPayload().RedirectTo, 307)
+			return
+		}
+		// show the Consent page
+		type ConsentData struct {
+			CsrfField template.HTML
+			Challange string
+			RequestedScope models.StringSlicePipeDelimiter
+			User string
+			Client *models.OAuth2Client
+		}
+		helpers.Render(w, "consent.html", "base.html", ConsentData{csrf.TemplateField(request), challenge, body.RequestedScope, body.Subject, body.Client})
+	}
+}
