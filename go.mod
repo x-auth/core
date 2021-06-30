@@ -1,4 +1,4 @@
-module nictec.net/auth
+module x-net.at/idp
 
 go 1.16
 

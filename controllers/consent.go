@@ -6,13 +6,13 @@ import (
 	"github.com/ory/hydra-client-go/models"
 	"html/template"
 	"net/http"
-	"nictec.net/auth/authenticators"
-	"nictec.net/auth/helpers"
+	"x-net.at/idp/authenticators"
+	"x-net.at/idp/helpers"
 )
 
-func Consent(w http.ResponseWriter, request *http.Request){
+func Consent(w http.ResponseWriter, request *http.Request) {
 	hydraAdmin := getAdmin()
-	if request.Method == http.MethodPost{
+	if request.Method == http.MethodPost {
 		// POST Handler
 		// get the context
 		ctx := request.Context()
@@ -28,7 +28,7 @@ func Consent(w http.ResponseWriter, request *http.Request){
 
 		consentGetResp, err := hydraAdmin.GetConsentRequest(consentGetParams)
 		if err != nil {
-			helpers.Error(w, 500, "Failed to get consent request: " + err.Error())
+			helpers.Error(w, 500, "Failed to get consent request: "+err.Error())
 			return
 		}
 
@@ -40,7 +40,7 @@ func Consent(w http.ResponseWriter, request *http.Request){
 
 		// handle the session
 		session := &models.ConsentRequestSession{}
-		if helpers.Contains(grantScope, "profile"){
+		if helpers.Contains(grantScope, "profile") {
 			authenticator := helpers.GetCookie(request, "authenticator")
 			profile := authenticators.GetProfile(authenticator, consentGetResp.GetPayload().Subject)
 			session.IDToken = profile
@@ -48,9 +48,9 @@ func Consent(w http.ResponseWriter, request *http.Request){
 
 		consentAcceptBody := &models.AcceptConsentRequest{
 			GrantAccessTokenAudience: consentGetResp.GetPayload().RequestedAccessTokenAudience,
-			GrantScope: grantScope,
-			Remember: remember,
-			Session: session,
+			GrantScope:               grantScope,
+			Remember:                 remember,
+			Session:                  session,
 		}
 
 		consentAcceptParams := admin.NewAcceptConsentRequestParams()
@@ -60,7 +60,7 @@ func Consent(w http.ResponseWriter, request *http.Request){
 
 		consentAcceptResp, err := hydraAdmin.AcceptConsentRequest(consentAcceptParams)
 		if err != nil {
-			helpers.Error(w, 500, "Failed to accept consent Request: " + err.Error())
+			helpers.Error(w, 500, "Failed to accept consent Request: "+err.Error())
 			return
 		}
 
@@ -85,7 +85,7 @@ func Consent(w http.ResponseWriter, request *http.Request){
 
 		consentGetResp, err := hydraAdmin.GetConsentRequest(consentGetParams)
 		if err != nil {
-			helpers.Error(w, 500, "Failed to get consent request: " + err.Error())
+			helpers.Error(w, 500, "Failed to get consent request: "+err.Error())
 			return
 		}
 
@@ -94,7 +94,7 @@ func Consent(w http.ResponseWriter, request *http.Request){
 			// grant the consent request
 			consentAcceptBody := &models.AcceptConsentRequest{
 				GrantAccessTokenAudience: consentGetResp.GetPayload().RequestedAccessTokenAudience,
-				GrantScope: consentGetResp.GetPayload().RequestedScope,
+				GrantScope:               consentGetResp.GetPayload().RequestedScope,
 			}
 			consentAcceptParams := admin.NewAcceptConsentRequestParams()
 			consentAcceptParams.WithContext(ctx)
@@ -102,8 +102,8 @@ func Consent(w http.ResponseWriter, request *http.Request){
 			consentAcceptParams.WithBody(consentAcceptBody)
 
 			consentAcceptResp, err := hydraAdmin.AcceptConsentRequest(consentAcceptParams)
-			if err != nil{
-				helpers.Error(w, 500, "Failed to accept consent Request: " + err.Error())
+			if err != nil {
+				helpers.Error(w, 500, "Failed to accept consent Request: "+err.Error())
 				return
 			}
 
@@ -112,11 +112,11 @@ func Consent(w http.ResponseWriter, request *http.Request){
 		}
 		// show the consent page
 		type ConsentData struct {
-			CSRFField template.HTML
-			Challenge string
+			CSRFField      template.HTML
+			Challenge      string
 			RequestedScope models.StringSlicePipeDelimiter
-			User string
-			Client string
+			User           string
+			Client         string
 		}
 		helpers.Render(w, "consent.html", "base.html", ConsentData{csrf.TemplateField(request), challenge_slice[0], consentGetResp.GetPayload().RequestedScope, consentGetResp.GetPayload().Subject, consentGetResp.GetPayload().Client.ClientName})
 	}

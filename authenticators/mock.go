@@ -7,11 +7,11 @@ type Profile struct {
 	Group     string `json:"group"`
 }
 
-func mock(username string, password string) (bool, Profile) {
-	if username == "nl@x-net.at" && password == "foobar" {
-		return true, Profile{"Nicholas", "Lamprecht", "nl@x-net.at", "Admins"}
+func mock(username string, password string) (string, Profile, bool) {
+	if username == "nl" && password == "foobar" {
+		return "mock", Profile{"Nicholas", "Lamprecht", "nl@x-net.at", "Admins"}, true
 	} else {
-		return false, Profile{}
+		return "mock", Profile{}, false
 	}
 }
 

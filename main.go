@@ -6,11 +6,11 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"nictec.net/auth/controllers"
-	"nictec.net/auth/helpers"
+	"x-net.at/idp/controllers"
+	"x-net.at/idp/helpers"
 )
 
-func main(){
+func main() {
 	// load the config
 	helpers.LoadConfig()
 
@@ -19,7 +19,7 @@ func main(){
 
 	// handle the urls
 	router := mux.NewRouter()
-	for _, route := range routes{
+	for _, route := range routes {
 		router.HandleFunc(route.path, route.handler)
 	}
 
@@ -29,7 +29,7 @@ func main(){
 
 	//set up csrf protection
 	key, err := ioutil.ReadFile("system/secret.key")
-	if err != nil{
+	if err != nil {
 		log.Fatal(err)
 	}
 	CSRF := csrf.Protect(key)
@@ -37,7 +37,7 @@ func main(){
 	// start the server
 	log.Println("Auth server is running on http://localhost:8000 press CTRL-C to quit")
 	err = http.ListenAndServe(":8000", CSRF(router))
-	if err != nil{
+	if err != nil {
 		log.Fatal(err)
 	}
 }

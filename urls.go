@@ -2,11 +2,11 @@ package main
 
 import (
 	"net/http"
-	"nictec.net/auth/controllers"
+	"x-net.at/idp/controllers"
 )
 
 type path struct {
-	path string
+	path    string
 	handler func(w http.ResponseWriter, r *http.Request)
 }
 

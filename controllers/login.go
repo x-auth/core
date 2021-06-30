@@ -6,20 +6,20 @@ import (
 	"github.com/ory/hydra-client-go/models"
 	"html/template"
 	"net/http"
-	"nictec.net/auth/authenticators"
-	"nictec.net/auth/helpers"
+	"x-net.at/idp/authenticators"
+	"x-net.at/idp/helpers"
 )
 
 type LoginData struct {
 	CSRFField template.HTML
 	Challenge string
-	Error bool
-	Message string
+	Error     bool
+	Message   string
 }
 
-func Login(w http.ResponseWriter, request *http.Request){
+func Login(w http.ResponseWriter, request *http.Request) {
 	hydraAdmin := getAdmin()
-	if request.Method == http.MethodPost{
+	if request.Method == http.MethodPost {
 		// POST Handler
 		// get the context
 		ctx := request.Context()
@@ -28,13 +28,13 @@ func Login(w http.ResponseWriter, request *http.Request){
 		// parse the form
 		err := request.ParseForm()
 		if err != nil {
-			helpers.Error(w, 500, "Failed to parse login form: " + err.Error())
+			helpers.Error(w, 500, "Failed to parse login form: "+err.Error())
 			return
 		}
 
 		// convert the remember me form data to bool
 		var rememberMe bool = false
-		if request.FormValue("remember") == "true"{
+		if request.FormValue("remember") == "true" {
 			rememberMe = true
 		}
 
@@ -42,7 +42,7 @@ func Login(w http.ResponseWriter, request *http.Request){
 		authenticator, profile, authOK := authenticators.Login(request.FormValue("email"), request.FormValue("password"))
 
 		// authentication failed, re-render the login form with error
-		if !authOK{
+		if !authOK {
 			helpers.Render(w, "login.html", "base.html", LoginData{csrf.TemplateField(request), request.FormValue("login-challenge"), true, "username or password is wrong"})
 			return
 		}
@@ -56,8 +56,8 @@ func Login(w http.ResponseWriter, request *http.Request){
 		loginGetParam.SetLoginChallenge(request.FormValue("login-challenge"))
 
 		_, err = hydraAdmin.GetLoginRequest(loginGetParam)
-		if err != nil{
-			helpers.Error(w, 500, "Failed to get login request: " + err.Error())
+		if err != nil {
+			helpers.Error(w, 500, "Failed to get login request: "+err.Error())
 			return
 		}
 
@@ -66,13 +66,13 @@ func Login(w http.ResponseWriter, request *http.Request){
 		loginAcceptParam.WithContext(ctx)
 		loginAcceptParam.SetLoginChallenge(request.FormValue("login-challenge"))
 		loginAcceptParam.SetBody(&models.AcceptLoginRequest{
-			Subject: &subject,
+			Subject:  &subject,
 			Remember: rememberMe,
 		})
 
 		respLoginAccept, err := hydraAdmin.AcceptLoginRequest(loginAcceptParam)
-		if err != nil{
-			helpers.Error(w, 500, "Failed to accept login request: " + err.Error())
+		if err != nil {
+			helpers.Error(w, 500, "Failed to accept login request: "+err.Error())
 			return
 		}
 
@@ -98,10 +98,12 @@ func Login(w http.ResponseWriter, request *http.Request){
 		loginGetParam.SetLoginChallenge(challenge_slice[0])
 
 		respLoginGet, err := hydraAdmin.GetLoginRequest(loginGetParam)
-		if err != nil{
-			helpers.Error(w, 500, "Failed to get login request info: " + err.Error())
+		if err != nil {
+			helpers.Error(w, 500, "Failed to get login request info: "+err.Error())
 			return
 		}
+
+		println(*respLoginGet.GetPayload().RequestURL)
 
 		// convert bool pointer to bool
 		skip := false
@@ -121,8 +123,8 @@ func Login(w http.ResponseWriter, request *http.Request){
 			})
 
 			respLoginAccept, err := hydraAdmin.AcceptLoginRequest(loginAcceptParam)
-			if err != nil{
-				helpers.Error(w, 400, "Cannot accept login request: " + err.Error())
+			if err != nil {
+				helpers.Error(w, 400, "Cannot accept login request: "+err.Error())
 				return
 			}
 
