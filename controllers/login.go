@@ -103,8 +103,6 @@ func Login(w http.ResponseWriter, request *http.Request) {
 			return
 		}
 
-		println(*respLoginGet.GetPayload().RequestURL)
-
 		// convert bool pointer to bool
 		skip := false
 		if respLoginGet.GetPayload().Skip != nil {

@@ -7,8 +7,8 @@ import (
 	"text/template"
 )
 
-func Render(w http.ResponseWriter, file string, basefile string, data interface{}){
-	if basefile == ""{
+func Render(w http.ResponseWriter, file string, basefile string, data interface{}) {
+	if basefile == "" {
 		tmpl := template.Must(template.ParseFiles("templates/" + file))
 		err := tmpl.Execute(w, data)
 		if err != nil {
@@ -23,9 +23,10 @@ func Render(w http.ResponseWriter, file string, basefile string, data interface{
 	}
 }
 
-func Error(w http.ResponseWriter, code int, message string){
+func Error(w http.ResponseWriter, code int, message string) {
+	log.Println(message)
 	type errorInfo struct {
-		Code int
+		Code    int
 		Message string
 	}
 	Render(w, "error.html", "base.html", errorInfo{code, message})

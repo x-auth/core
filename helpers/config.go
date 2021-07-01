@@ -7,8 +7,10 @@ import (
 )
 
 type realm struct {
-	Identifier    string `yaml:"identifier"`
-	Authenticator string `yaml:"authenticator"`
+	Identifier    string            `yaml:"identifier"`
+	Authenticator string            `yaml:"authenticator"`
+	Default       bool              `yaml:"default"`
+	Config        map[string]string `yaml:"config,omitempty"`
 }
 
 type authenticator struct {
