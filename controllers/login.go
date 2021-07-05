@@ -18,7 +18,7 @@ type LoginData struct {
 }
 
 func Login(w http.ResponseWriter, request *http.Request) {
-	hydraAdmin := getAdmin()
+	hydraAdmin := helpers.GetAdmin()
 	if request.Method == http.MethodPost {
 		// POST Handler
 		// get the context
@@ -39,17 +39,18 @@ func Login(w http.ResponseWriter, request *http.Request) {
 		}
 
 		// validate username and password by trying all authenticators
-		authenticator, profile, authOK := authenticators.Login(request.FormValue("email"), request.FormValue("password"))
+		cookie, err := request.Cookie("x-idp-authenticator")
+		if err != nil {
+			helpers.Error(w, 500, "Cookie Error: "+err.Error())
+		}
+
+		profile, authOK := authenticators.Login(request.FormValue("email"), request.FormValue("password"), cookie)
 
 		// authentication failed, re-render the login form with error
 		if !authOK {
 			helpers.Render(w, "login.html", "base.html", LoginData{csrf.TemplateField(request), request.FormValue("login-challenge"), true, "username or password is wrong"})
 			return
 		}
-
-		// auth successful
-		// set authenticator cookie
-		http.SetCookie(w, &http.Cookie{Name: "authenticator", Value: authenticator})
 
 		// use Hydra admin to accept the login request
 		loginGetParam := admin.NewGetLoginRequestParams()

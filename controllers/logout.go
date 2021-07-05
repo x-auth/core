@@ -1,7 +1,7 @@
 package controllers
 
 //func Logout(w http.ResponseWriter, request *http.Request){
-//	hydraAdmin := getAdmin()
+//	hydraAdmin := GetAdmin()
 //	query := request.URL.Query()
 //	// the challenge is used to fetch information from hydra
 //	challenge_list := query["challenge"]

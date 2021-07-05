@@ -1,63 +1,54 @@
 package authenticators
 
 import (
+	"net/http"
 	"strings"
 	"x-net.at/idp/helpers"
 )
 
-func Login(identifier string, password string) (string, Profile, bool) {
+func getConfig(authenticator string, realmId string) map[string]string {
+	for _, realm := range helpers.Config.Realms {
+		if realm.Identifier == realmId {
+			for _, auth := range helpers.Config.Authenticators {
+				if auth.Type == authenticator {
+					return helpers.ReduceConfig(auth.Config, realm.Config)
+				}
+			}
+		}
+	}
+	return nil
+}
 
-	// get the needed config values
-	authenticators := helpers.Config.Authenticators
-	realms := helpers.Config.Realms
-
+func Login(identifier string, password string, cookie *http.Cookie) (Profile, bool) {
 	// check if a valid split char is in the identifier
 	ok, splitChar := helpers.SliceContains(identifier, helpers.Config.SplitCharacters)
+	if !ok {
+		return Profile{}, false
+	}
 
 	// split the identifier in username and realm
 	idSlice := strings.Split(identifier, splitChar)
 	username := idSlice[0]
 	realmName := idSlice[1]
 
-	// default fallback
-	if !ok {
-		for _, realm := range realms {
-			if realm.Default {
-				for _, authCfg := range authenticators {
-					if authCfg.Name == realm.Authenticator {
-						if authCfg.Type == "mock" {
-							cfg := helpers.ReduceConfig(authCfg.Config, realm.Config)
-							name, profile, ok := mock(username, password, cfg)
-							if !ok {
-								continue
-							} else {
-								return name, profile, ok
-							}
-						}
-					}
-				}
-			}
-		}
+	// get the authenticator and realm from the preflight via secure cookie
+	value := make(map[string]string)
+	err := helpers.SecureCookie.Decode("x-idp-authenticator", cookie.Value, &value)
+	if err != nil {
+		return Profile{}, false
 	}
 
-	// iterate over all configured realms
-	for _, realm := range realms {
-		// check if the realm in the identifier matches a configured realm
-		if realm.Identifier == realmName {
-			for _, authCfg := range authenticators {
-				if authCfg.Name == realm.Authenticator {
-					if authCfg.Type == "mock" {
-						cfg := helpers.ReduceConfig(authCfg.Config, realm.Config)
-						name, profile, ok := mock(username, password, cfg)
-						if !ok {
-							continue
-						} else {
-							return name, profile, ok
-						}
-					}
-				}
-			}
-		}
+	preflightAuthenticator := value["authenticator"]
+	preflightRealm := value["realm"]
+
+	// quit if the input is wrong
+	if realmName != preflightRealm {
+		return Profile{}, false
 	}
-	return "", Profile{}, false
+
+	// authenticate using the right authenticator
+	if preflightAuthenticator == "mock" {
+		return mock(username, password, getConfig(preflightAuthenticator, preflightRealm))
+	}
+	return Profile{}, false
 }

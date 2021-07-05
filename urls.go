@@ -14,4 +14,6 @@ var routes []path = []path{
 	{"/", controllers.Login},
 	//{"/logout", controllers.Logout},
 	{"/consent", controllers.Consent},
+	{"/preflight", controllers.GetAuthenticator},
+	{"/urls", controllers.Urls},
 }

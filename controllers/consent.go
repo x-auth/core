@@ -11,7 +11,7 @@ import (
 )
 
 func Consent(w http.ResponseWriter, request *http.Request) {
-	hydraAdmin := getAdmin()
+	hydraAdmin := helpers.GetAdmin()
 	if request.Method == http.MethodPost {
 		// POST Handler
 		// get the context
@@ -41,8 +41,18 @@ func Consent(w http.ResponseWriter, request *http.Request) {
 		// handle the session
 		session := &models.ConsentRequestSession{}
 		if helpers.Contains(grantScope, "profile") {
-			authenticator := helpers.GetCookie(request, "authenticator")
-			profile := authenticators.GetProfile(authenticator, consentGetResp.GetPayload().Subject)
+			cookie, err := request.Cookie("x-idp-authenticator")
+			if err != nil {
+				helpers.Error(w, 500, "cookie error: "+err.Error())
+			}
+
+			value := make(map[string]string)
+			err = helpers.SecureCookie.Decode("x-idp-authenticator", cookie.Value, &value)
+			if err != nil {
+				helpers.Error(w, 500, "cookie error: "+err.Error())
+			}
+
+			profile := authenticators.GetProfile(value["authenticator"], consentGetResp.GetPayload().Subject)
 			session.IDToken = profile
 		}
 

@@ -3,10 +3,8 @@ package main
 import (
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
-	"io/ioutil"
 	"log"
 	"net/http"
-	"x-net.at/idp/controllers"
 	"x-net.at/idp/helpers"
 )
 
@@ -15,7 +13,13 @@ func main() {
 	helpers.LoadConfig()
 
 	// init hydra
-	controllers.InitHydra()
+	err := helpers.InitHydra()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// init kratos
+	helpers.InitKratosClient()
 
 	// handle the urls
 	router := mux.NewRouter()
@@ -27,12 +31,14 @@ func main() {
 	fs := http.FileServer(http.Dir("static"))
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", fs))
 
-	//set up csrf protection
-	key, err := ioutil.ReadFile("system/secret.key")
-	if err != nil {
-		log.Fatal(err)
-	}
-	CSRF := csrf.Protect(key)
+	//load secret key
+	helpers.LoadSecretKey()
+
+	// set up csrf protection
+	CSRF := csrf.Protect(helpers.SecretKey)
+
+	//init secure cookie
+	helpers.InitSecureCookie()
 
 	// start the server
 	log.Println("Auth server is running on http://localhost:8000 press CTRL-C to quit")
