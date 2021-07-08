@@ -5,6 +5,7 @@ import (
 	"github.com/ory/hydra-client-go/client/admin"
 	"github.com/ory/hydra-client-go/models"
 	"html/template"
+	"log"
 	"net/http"
 	"x-net.at/idp/authenticators"
 	"x-net.at/idp/helpers"
@@ -52,7 +53,20 @@ func Consent(w http.ResponseWriter, request *http.Request) {
 				helpers.Error(w, 500, "cookie error: "+err.Error())
 			}
 
-			profile := authenticators.GetProfile(value["authenticator"], consentGetResp.GetPayload().Subject)
+			// get the profile cookie for the ldap authenticator
+			ldapCookie, err := request.Cookie("x-idp-profile")
+			if err != nil {
+				helpers.Error(w, 400, "Cookie error: "+err.Error())
+				return
+			}
+
+			// get the profile
+			profile := authenticators.GetProfile(value["authenticator"], consentGetResp.GetPayload().Subject, ldapCookie)
+			if profile.Email == "" {
+				log.Println("Fatal: getProfile did not return anything, flow aborted!")
+				helpers.Error(w, 500, "An unknown error occured, please try again later")
+			}
+
 			session.IDToken = profile
 		}
 

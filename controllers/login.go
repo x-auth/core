@@ -44,7 +44,7 @@ func Login(w http.ResponseWriter, request *http.Request) {
 			helpers.Error(w, 500, "Cookie Error: "+err.Error())
 		}
 
-		profile, authOK := authenticators.Login(request.FormValue("email"), request.FormValue("password"), cookie)
+		profile, authOK := authenticators.Login(request.FormValue("email"), request.FormValue("password"), cookie, &w)
 
 		// authentication failed, re-render the login form with error
 		if !authOK {

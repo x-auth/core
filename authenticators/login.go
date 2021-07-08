@@ -1,6 +1,7 @@
 package authenticators
 
 import (
+	"log"
 	"net/http"
 	"strings"
 	"x-net.at/idp/helpers"
@@ -19,7 +20,7 @@ func getConfig(authenticator string, realmId string) map[string]string {
 	return nil
 }
 
-func Login(identifier string, password string, cookie *http.Cookie) (Profile, bool) {
+func Login(identifier string, password string, cookie *http.Cookie, w *http.ResponseWriter) (Profile, bool) {
 	// check if a valid split char is in the identifier
 	ok, splitChar := helpers.SliceContains(identifier, helpers.Config.SplitCharacters)
 	if !ok {
@@ -28,7 +29,7 @@ func Login(identifier string, password string, cookie *http.Cookie) (Profile, bo
 
 	// split the identifier in username and realm
 	idSlice := strings.Split(identifier, splitChar)
-	username := idSlice[0]
+	username := identifier
 	realmName := idSlice[1]
 
 	// get the authenticator and realm from the preflight via secure cookie
@@ -49,6 +50,23 @@ func Login(identifier string, password string, cookie *http.Cookie) (Profile, bo
 	// authenticate using the right authenticator
 	if preflightAuthenticator == "mock" {
 		return mock(username, password, getConfig(preflightAuthenticator, preflightRealm))
+	} else if preflightAuthenticator == "ldap" {
+		profile, ok := ldap(username, password, getConfig(preflightAuthenticator, preflightRealm))
+		if !ok {
+			return Profile{}, false
+		}
+
+		// set the profile cookie
+		encoded, err := helpers.SecureCookie.Encode("x-idp-profile", profile)
+		if err != nil {
+			log.Println(err)
+			return Profile{}, false
+		}
+
+		http.SetCookie(*w, &http.Cookie{Name: "x-idp-profile", Value: encoded})
+
+		return profile, ok
 	}
+
 	return Profile{}, false
 }
