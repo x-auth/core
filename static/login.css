@@ -1,5 +1,9 @@
+body{
+    overflow: hidden;
+}
+
 .login-dark {
-    height:1000px;
+    height:1010px;
     background:#475d62 url(/static/star-sky.jpg);
     background-size:cover;
     position:relative;
@@ -70,3 +74,38 @@
     transform:translateY(1px);
 }
 
+.error-container{
+    background-color: #172435;
+    color: white;
+    width: 30em;
+    min-height: 10em;
+    text-align: center;
+    padding-top: 2em;
+    position: absolute;
+    top: 37%;
+    left: 37%;
+    border-radius: 4px;
+}
+
+footer{
+    display: flex;
+    flex-direction: row;
+    position: absolute;
+    top: 97%;
+    color: white;
+    width: 100%;
+    font-weight: bold;
+}
+
+footer>.version{
+    margin-left: 15px;
+}
+
+footer>.copyright{
+    margin-left: 80%;
+
+}
+
+footer>.copyright>a{
+    color: white;
+}

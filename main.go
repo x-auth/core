@@ -6,9 +6,13 @@ import (
 	"log"
 	"net/http"
 	"x-net.at/idp/helpers"
+	"x-net.at/idp/logger"
 )
 
 func main() {
+	// set up logging
+	logger.Init()
+
 	// load the config
 	helpers.LoadConfig()
 
@@ -41,8 +45,8 @@ func main() {
 	helpers.InitSecureCookie()
 
 	// start the server
-	log.Println("Auth server is running on http://localhost:8000 press CTRL-C to quit")
-	err = http.ListenAndServe(":8000", CSRF(router))
+	logger.Info.Println("X-IDP server is running on " + helpers.Config.Host + " press CTRL-C to quit")
+	err = http.ListenAndServe(helpers.Config.Host, CSRF(router))
 	if err != nil {
 		log.Fatal(err)
 	}

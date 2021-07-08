@@ -1,10 +1,10 @@
 package authenticators
 
 import (
-	"log"
 	"net/http"
 	"strings"
 	"x-net.at/idp/helpers"
+	"x-net.at/idp/logger"
 )
 
 func getConfig(authenticator string, realmId string) map[string]string {
@@ -24,6 +24,7 @@ func Login(identifier string, password string, cookie *http.Cookie, w *http.Resp
 	// check if a valid split char is in the identifier
 	ok, splitChar := helpers.SliceContains(identifier, helpers.Config.SplitCharacters)
 	if !ok {
+		logger.Error.Println("No valid split character in identifier")
 		return Profile{}, false
 	}
 
@@ -36,6 +37,7 @@ func Login(identifier string, password string, cookie *http.Cookie, w *http.Resp
 	value := make(map[string]string)
 	err := helpers.SecureCookie.Decode("x-idp-authenticator", cookie.Value, &value)
 	if err != nil {
+		logger.Error.Println(err)
 		return Profile{}, false
 	}
 
@@ -53,13 +55,14 @@ func Login(identifier string, password string, cookie *http.Cookie, w *http.Resp
 	} else if preflightAuthenticator == "ldap" {
 		profile, ok := ldap(username, password, getConfig(preflightAuthenticator, preflightRealm))
 		if !ok {
+			logger.Warning.Println("Login failed, Username or password wrong")
 			return Profile{}, false
 		}
 
 		// set the profile cookie
 		encoded, err := helpers.SecureCookie.Encode("x-idp-profile", profile)
 		if err != nil {
-			log.Println(err)
+			logger.Error.Println(err)
 			return Profile{}, false
 		}
 

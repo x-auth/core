@@ -35,6 +35,14 @@ func Error(w http.ResponseWriter, code int, message string) {
 		Code    int
 		Message string
 	}
+	if !Config.Debug {
+		if code == 400 {
+			message = "Bad Request"
+		} else {
+			message = "Internal Server Error\n Please try again later"
+		}
+	}
+
 	w.WriteHeader(code)
 	Render(w, "error.html", "base.html", errorInfo{code, message})
 }

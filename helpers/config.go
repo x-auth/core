@@ -11,6 +11,7 @@ type realm struct {
 	Identifier    string            `yaml:"identifier"`
 	Authenticator string            `yaml:"authenticator"`
 	Default       bool              `yaml:"default"`
+	SkipConsent   bool              `yaml:"skip_consent"`
 	Config        map[string]string `yaml:"config,omitempty"`
 }
 
@@ -21,6 +22,8 @@ type authenticator struct {
 }
 
 type conf struct {
+	Debug           bool
+	Host            string          `yaml:"host"`
 	HydraURL        string          `yaml:"hydra_url"`
 	KratosURL       string          `yaml:"kratos_url"`
 	RememberFor     int64           `yaml:"remember_for"`
@@ -43,6 +46,9 @@ func LoadConfig() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	//set debug mode
+	Config.Debug = true
 
 	// validate split characters
 	punctuations := ".,:;-!?"

@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strings"
 	"x-net.at/idp/helpers"
+	"x-net.at/idp/logger"
 )
 
 type authCheckRequest struct {
@@ -24,6 +25,7 @@ func GetAuthenticator(w http.ResponseWriter, request *http.Request) {
 	var req authCheckRequest
 	err := json.NewDecoder(request.Body).Decode(&req)
 	if err != nil {
+		logger.Error.Println("Failed to decode JSON," + err.Error())
 		helpers.JsonError(w, 400, "Decode error: "+err.Error())
 		return
 	}

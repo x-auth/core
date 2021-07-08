@@ -5,10 +5,10 @@ import (
 	"github.com/ory/hydra-client-go/client/admin"
 	"github.com/ory/hydra-client-go/models"
 	"html/template"
-	"log"
 	"net/http"
 	"x-net.at/idp/authenticators"
 	"x-net.at/idp/helpers"
+	"x-net.at/idp/logger"
 )
 
 func Consent(w http.ResponseWriter, request *http.Request) {
@@ -29,6 +29,7 @@ func Consent(w http.ResponseWriter, request *http.Request) {
 
 		consentGetResp, err := hydraAdmin.GetConsentRequest(consentGetParams)
 		if err != nil {
+			logger.Error.Println("Failed to get consent request, " + err.Error())
 			helpers.Error(w, 500, "Failed to get consent request: "+err.Error())
 			return
 		}
@@ -44,18 +45,21 @@ func Consent(w http.ResponseWriter, request *http.Request) {
 		if helpers.Contains(grantScope, "profile") {
 			cookie, err := request.Cookie("x-idp-authenticator")
 			if err != nil {
+				logger.Error.Println(err)
 				helpers.Error(w, 500, "cookie error: "+err.Error())
 			}
 
 			value := make(map[string]string)
 			err = helpers.SecureCookie.Decode("x-idp-authenticator", cookie.Value, &value)
 			if err != nil {
+				logger.Error.Println(err)
 				helpers.Error(w, 500, "cookie error: "+err.Error())
 			}
 
 			// get the profile cookie for the ldap authenticator
 			ldapCookie, err := request.Cookie("x-idp-profile")
 			if err != nil {
+				logger.Warning.Println(err)
 				helpers.Error(w, 400, "Cookie error: "+err.Error())
 				return
 			}
@@ -63,7 +67,7 @@ func Consent(w http.ResponseWriter, request *http.Request) {
 			// get the profile
 			profile := authenticators.GetProfile(value["authenticator"], consentGetResp.GetPayload().Subject, ldapCookie)
 			if profile.Email == "" {
-				log.Println("Fatal: getProfile did not return anything, flow aborted!")
+				logger.Error.Println("getProfile did not return anything, flow aborted!")
 				helpers.Error(w, 500, "An unknown error occured, please try again later")
 			}
 
@@ -84,6 +88,7 @@ func Consent(w http.ResponseWriter, request *http.Request) {
 
 		consentAcceptResp, err := hydraAdmin.AcceptConsentRequest(consentAcceptParams)
 		if err != nil {
+			logger.Error.Println(err)
 			helpers.Error(w, 500, "Failed to accept consent Request: "+err.Error())
 			return
 		}
@@ -98,6 +103,7 @@ func Consent(w http.ResponseWriter, request *http.Request) {
 		// get the login challenge
 		challenge_slice, ok := request.URL.Query()["consent_challenge"]
 		if !ok || len(challenge_slice) < 1 {
+			logger.Warning.Println("Expected a login challenge but received none")
 			helpers.Error(w, 400, "Expected a login challenge but received none")
 			return
 		}
@@ -109,6 +115,7 @@ func Consent(w http.ResponseWriter, request *http.Request) {
 
 		consentGetResp, err := hydraAdmin.GetConsentRequest(consentGetParams)
 		if err != nil {
+			logger.Error.Println("Failed to get consent request: " + err.Error())
 			helpers.Error(w, 500, "Failed to get consent request: "+err.Error())
 			return
 		}
@@ -127,6 +134,7 @@ func Consent(w http.ResponseWriter, request *http.Request) {
 
 			consentAcceptResp, err := hydraAdmin.AcceptConsentRequest(consentAcceptParams)
 			if err != nil {
+				logger.Error.Println("Failed to get consent request: " + err.Error())
 				helpers.Error(w, 500, "Failed to accept consent Request: "+err.Error())
 				return
 			}
