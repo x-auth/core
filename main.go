@@ -22,9 +22,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// init kratos
-	helpers.InitKratosClient()
-
 	// handle the urls
 	router := mux.NewRouter()
 	for _, route := range routes {

@@ -10,6 +10,7 @@ import (
 
 type authCheckRequest struct {
 	Identifier string `json:"identifier"`
+	Challenge  string `json:"challenge"`
 }
 
 type authCheckResponse struct {
@@ -31,6 +32,7 @@ func GetAuthenticator(w http.ResponseWriter, request *http.Request) {
 	}
 
 	identifier := req.Identifier
+	challenge := req.Challenge
 
 	// check if a valid split char is in the identifier
 	ok, splitChar := helpers.SliceContains(identifier, helpers.Config.SplitCharacters)
@@ -71,6 +73,7 @@ func GetAuthenticator(w http.ResponseWriter, request *http.Request) {
 			for _, authCfg := range helpers.Config.Authenticators {
 				if authCfg.Name == realm.Authenticator {
 					if authCfg.Type == "kratos" {
+						http.SetCookie(w, &http.Cookie{Name: "x-idp-challenge", Value: challenge})
 						helpers.JsonResponse(w, authCheckResponse{NeedsRedirect: true})
 						return
 					} else {

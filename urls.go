@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 	"x-net.at/idp/controllers"
+	"x-net.at/idp/controllers/auth"
 )
 
 type path struct {
@@ -11,9 +12,9 @@ type path struct {
 }
 
 var routes []path = []path{
-	{"/", controllers.Login},
+	{"/", auth.Login},
 	//{"/logout", controllers.Logout},
-	{"/consent", controllers.Consent},
+	{"/consent", auth.Consent},
 	{"/preflight", controllers.GetAuthenticator},
 	{"/urls", controllers.Urls},
 }

@@ -4,7 +4,6 @@ async function loadURLs(){
 }
 
 async function send(event){
-    console.log("sending...")
     // stop the form from submitting
     event.preventDefault()
 
@@ -17,8 +16,10 @@ async function send(event){
     let csrfToken = document.getElementsByName("gorilla.csrf.Token")[0].value
 
     // build the request data
+    var urlParams = window.location.search
     let data = {
-        identifier: identifier
+        identifier: identifier,
+        login_challenge: urlParams.split("=")[1]
     }
 
     let url = "/preflight";
@@ -44,6 +45,7 @@ async function send(event){
     }
 
     if (content.needs_redirect){
+        // FEATURE: handle kratos flow init here
         form.action = urls.kratos_url;
     } else {
         form.action = "/"
@@ -52,5 +54,4 @@ async function send(event){
     form.submit()
 }
 
-console.log("js ready")
 document.getElementById("login-form").addEventListener("submit", send)
