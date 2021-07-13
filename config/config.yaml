@@ -1,0 +1,63 @@
+# host of the idp
+host: localhost:8000
+# url of the hyda admin interface
+hydra_url: http://localhost:4445
+# time in seconds in which a user should be remembered
+remember_for: 3000
+
+# characters by which a identifier is split in username and realm
+# WARINIG: Don´t use punctuation marks here because they can be present in the name part of a e.g. email address!
+split_characters: ["@"]
+
+# authenticators define the auth method for (multiple) realms
+# The config of authenticators and realms is merged.
+authenticators:
+  - type: mock
+    name: test
+    config:
+      username: "foo@example.com"
+
+  - type: ldap
+    name: "AD"
+    config:
+      # Each of these config keys can also be put in the realm
+
+      # skip ssl/tls verification, never set this to true in production
+      skip_verify: true
+
+      # use starttls
+      use_tls: false
+
+      # ldap bind dn and password
+      bind_dn: "cn=connect,cn=users,dc=example,dc=com"
+      bind_pw: goodpassword
+
+      # ldap search base dn and filter
+      base_dn: "cn=users,dc=example,dc=com"
+      filter: "(objectClass=user)"
+
+      # ldap attribute mapping
+      name: cn
+      email: mail
+      groups: memberOf
+
+# Realms define which strings after the split character use which authenticator.
+# Similar config attributes in the realm config overwrite attributes of the authenticator.
+realms:
+    # this realm is for testing only NEVER use it in production!!
+    # string which identifies the authenticator (located behind one of the split characters)
+  - identifier: "example.net"
+    authenticator: test
+    # if default is true this realm is used if no other realm matches
+    default: true
+    config:
+      # every config from the authenticator can be put here, these values have priority
+      password: "foobar"
+
+    # same as above only a example for ldap
+  - identifier: "example.com"
+    authenticator: "AD"
+    default: false
+    skip_consent: true
+    config:
+      host: ldap.example.com

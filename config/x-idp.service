@@ -1,0 +1,12 @@
+[Unit]
+Description=X-Identity-Provider
+
+[Service]
+Type=simple
+ExecStart=/opt/x-idp/idp
+WorkingDirectory=/opt/x-idp
+User=x-idp
+Group=x-idp
+
+[Install]
+WantedBy=multi-user.target
