@@ -87,7 +87,8 @@ func GetAuthenticator(w http.ResponseWriter, request *http.Request) {
 							helpers.JsonError(w, 500, "Cookie Error: "+err.Error())
 							return
 						}
-						http.SetCookie(w, &http.Cookie{Name: "x-idp-authenticator", Value: encoded, Secure: true, HttpOnly: true})
+						// TODO: handle the secure false with a config value
+						http.SetCookie(w, &http.Cookie{Name: "x-idp-authenticator", Value: encoded, Secure: false, HttpOnly: true})
 
 						// tell the client to not redirect
 						helpers.JsonResponse(w, authCheckResponse{NeedsRedirect: false})
