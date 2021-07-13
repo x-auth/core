@@ -66,7 +66,7 @@ func Login(identifier string, password string, cookie *http.Cookie, w *http.Resp
 			return Profile{}, false
 		}
 
-		http.SetCookie(*w, &http.Cookie{Name: "x-idp-profile", Value: encoded})
+		http.SetCookie(*w, &http.Cookie{Name: "x-idp-profile", Value: encoded, Secure: false})
 
 		return profile, ok
 	}
