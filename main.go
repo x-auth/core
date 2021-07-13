@@ -36,7 +36,8 @@ func main() {
 	helpers.LoadSecretKey()
 
 	// set up csrf protection
-	CSRF := csrf.Protect(helpers.SecretKey)
+	// TODO: Add https option for secure false
+	CSRF := csrf.Protect(helpers.SecretKey, csrf.Secure(false))
 
 	//init secure cookie
 	helpers.InitSecureCookie()
