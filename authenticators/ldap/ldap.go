@@ -1,4 +1,4 @@
-package authenticators
+package ldap
 
 import (
 	"crypto/tls"
@@ -9,6 +9,7 @@ import (
 	"strings"
 	"x-net.at/idp/helpers"
 	"x-net.at/idp/logger"
+	"x-net.at/idp/models"
 )
 
 // helper to get ldap attribute by name
@@ -30,11 +31,11 @@ func getGroups(groupCNs []string) []string {
 	return groups
 }
 
-func ldap(username string, password string, config map[string]string) (Profile, bool) {
+func Login(username string, password string, config map[string]string) (models.Profile, bool) {
 	useTLS, err := strconv.ParseBool(config["use_tls"])
 	if err != nil {
 		logger.Error.Println(err.Error())
-		return Profile{}, false
+		return models.Profile{}, false
 	}
 
 	// check if ssl/tls cert verification should be skipped
@@ -42,7 +43,7 @@ func ldap(username string, password string, config map[string]string) (Profile, 
 	skipVerify, err := strconv.ParseBool(config["skip_verify"])
 	if err != nil {
 		logger.Error.Println(err.Error())
-		return Profile{}, false
+		return models.Profile{}, false
 	}
 
 	// check if the ldap-server uses tls
@@ -51,14 +52,14 @@ func ldap(username string, password string, config map[string]string) (Profile, 
 		conn, err = ldap3.DialURL("ldap://" + config["host"])
 		if err != nil {
 			logger.Error.Println(err.Error())
-			return Profile{}, false
+			return models.Profile{}, false
 		}
 
 		// upgrade connection to TLS
 		err = conn.StartTLS(&tls.Config{InsecureSkipVerify: skipVerify})
 		if err != nil {
 			logger.Error.Println(err.Error())
-			return Profile{}, false
+			return models.Profile{}, false
 		}
 	} else {
 		// configure and setup ssl
@@ -67,7 +68,7 @@ func ldap(username string, password string, config map[string]string) (Profile, 
 
 		if err != nil {
 			logger.Error.Println(err.Error())
-			return Profile{}, false
+			return models.Profile{}, false
 		}
 	}
 
@@ -75,7 +76,7 @@ func ldap(username string, password string, config map[string]string) (Profile, 
 	err = conn.Bind(config["bind_dn"], config["bind_pw"])
 	if err != nil {
 		logger.Error.Println(err.Error())
-		return Profile{}, false
+		return models.Profile{}, false
 	}
 
 	// set up the search for the given username
@@ -93,13 +94,13 @@ func ldap(username string, password string, config map[string]string) (Profile, 
 	searchResult, err := conn.Search(searchRequest)
 	if err != nil {
 		logger.Error.Println(err.Error())
-		return Profile{}, false
+		return models.Profile{}, false
 	}
 
 	// get the first Entry of the searchResult
 	if len(searchResult.Entries) != 1 {
 		logger.Error.Println("User does not exist or too many entries returned")
-		return Profile{}, false
+		return models.Profile{}, false
 	}
 	userdn := searchResult.Entries[0].DN
 
@@ -107,7 +108,7 @@ func ldap(username string, password string, config map[string]string) (Profile, 
 	err = conn.Bind(userdn, password)
 	if err != nil {
 		logger.Error.Println(err.Error())
-		return Profile{}, false
+		return models.Profile{}, false
 	}
 
 	// search for the user dn with the users bind, to get the profile information
@@ -126,31 +127,31 @@ func ldap(username string, password string, config map[string]string) (Profile, 
 	userSearchResult, err := conn.Search(userSearchRequest)
 	if err != nil {
 		logger.Error.Println(err.Error())
-		return Profile{}, false
+		return models.Profile{}, false
 	}
 
 	// get the first Entry of the searchResult
 	if len(userSearchResult.Entries) != 1 {
 		logger.Error.Println("User does not exist or too many entries returned")
-		return Profile{}, false
+		return models.Profile{}, false
 	}
 
 	// parse the ldap entry to the internal Profile struct
 	userAttrs := userSearchResult.Entries[0].Attributes
 	groups := getGroups(getAttr(userAttrs, config["groups"]))
-	profile := Profile{Name: getAttr(userAttrs, config["name"])[0], Email: getAttr(userAttrs, config["email"])[0], Groups: groups}
+	profile := models.Profile{Name: getAttr(userAttrs, config["name"])[0], Email: getAttr(userAttrs, config["email"])[0], Groups: groups}
 
 	// auth successful, profile cookie is set in the http handler
 	return profile, true
 }
 
-func getLdapProfile(cookie *http.Cookie) Profile {
+func GetProfile(cookie *http.Cookie) models.Profile {
 	// get the profile information from the x-idp-profile cookie
-	value := new(Profile)
+	value := new(models.Profile)
 	err := helpers.SecureCookie.Decode("x-idp-profile", cookie.Value, &value)
 	if err != nil {
 		logger.Error.Println(err)
-		return Profile{}
+		return models.Profile{}
 	}
 
 	return *value

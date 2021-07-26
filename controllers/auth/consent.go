@@ -56,16 +56,15 @@ func Consent(w http.ResponseWriter, request *http.Request) {
 				helpers.Error(w, 500, "cookie error: "+err.Error())
 			}
 
-			// get the profile cookie for the ldap authenticator
-			ldapCookie, err := request.Cookie("x-idp-profile")
+			// if the authenticator has set the profile cookie get it, else set the variable to nil
+			authenticatorCookie, err := request.Cookie("x-idp-profile")
 			if err != nil {
 				logger.Warning.Println(err)
-				helpers.Error(w, 400, "Cookie error: "+err.Error())
-				return
+				authenticatorCookie = nil
 			}
 
 			// get the profile
-			profile := authenticators.GetProfile(value["authenticator"], consentGetResp.GetPayload().Subject, ldapCookie)
+			profile := authenticators.GetProfile(value["authenticator"], consentGetResp.GetPayload().Subject, authenticatorCookie)
 			if profile.Email == "" {
 				logger.Error.Println("getProfile did not return anything, flow aborted!")
 				helpers.Error(w, 500, "An unknown error occured, please try again later")
