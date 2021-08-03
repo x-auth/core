@@ -1,4 +1,4 @@
-package authenticators
+package models
 
 type Profile struct {
 	Id     string   `json:"id"`
