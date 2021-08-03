@@ -138,7 +138,7 @@ func ldap(username string, password string, config map[string]string) (Profile, 
 	// parse the ldap entry to the internal Profile struct
 	userAttrs := userSearchResult.Entries[0].Attributes
 	groups := getGroups(getAttr(userAttrs, config["groups"]))
-	profile := Profile{Name: getAttr(userAttrs, config["name"])[0], Email: getAttr(userAttrs, config["email"])[0], Groups: groups}
+	profile := Profile{Id: userdn, Name: getAttr(userAttrs, config["name"])[0], Email: getAttr(userAttrs, config["email"])[0], Groups: groups}
 
 	// auth successful, profile cookie is set in the http handler
 	return profile, true

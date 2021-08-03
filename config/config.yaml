@@ -46,7 +46,8 @@ authenticators:
 realms:
     # this realm is for testing only NEVER use it in production!!
     # string which identifies the authenticator (located behind one of the split characters)
-  - identifier: "example.net"
+  - name: example
+    identifier: "example.net"
     authenticator: test
     # if default is true this realm is used if no other realm matches
     default: true
@@ -55,7 +56,8 @@ realms:
       password: "foobar"
 
     # same as above only a example for ldap
-  - identifier: "example.com"
+  - name: ldap
+    identifier: "example.com"
     authenticator: "AD"
     default: false
     skip_consent: true

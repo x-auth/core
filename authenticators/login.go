@@ -1,7 +1,6 @@
 package authenticators
 
 import (
-	"net/http"
 	"strings"
 	"x-net.at/idp/helpers"
 	"x-net.at/idp/logger"
@@ -9,7 +8,7 @@ import (
 
 func getConfig(authenticator string, realmId string) map[string]string {
 	for _, realm := range helpers.Config.Realms {
-		if realm.Identifier == realmId {
+		if realm.Name == realmId {
 			for _, auth := range helpers.Config.Authenticators {
 				if auth.Type == authenticator {
 					return helpers.ReduceConfig(auth.Config, realm.Config)
@@ -20,7 +19,7 @@ func getConfig(authenticator string, realmId string) map[string]string {
 	return nil
 }
 
-func Login(identifier string, password string, cookie *http.Cookie, w *http.ResponseWriter) (Profile, bool) {
+func Login(identifier string, password string, preflightRealm string) (Profile, bool) {
 	// check if a valid split char is in the identifier
 	ok, splitChar := helpers.SliceContains(identifier, helpers.Config.SplitCharacters)
 	if !ok {
@@ -33,40 +32,36 @@ func Login(identifier string, password string, cookie *http.Cookie, w *http.Resp
 	username := identifier
 	realmName := idSlice[1]
 
-	// get the authenticator and realm from the preflight via secure cookie
-	value := make(map[string]string)
-	err := helpers.SecureCookie.Decode("x-idp-authenticator", cookie.Value, &value)
-	if err != nil {
-		logger.Error.Println(err)
+	// get the realm and autheticator
+	var realmObj helpers.Realm
+	for _, realm := range helpers.Config.Realms {
+		if realm.Name == preflightRealm {
+			realmObj = realm
+		}
+	}
+
+	// quit if the input is wrong
+	if realmName != realmObj.Identifier {
+		logger.Error.Println("realm did not match preflight: " + realmName + " " + realmObj.Identifier)
 		return Profile{}, false
 	}
 
-	preflightAuthenticator := value["authenticator"]
-	preflightRealm := value["realm"]
-
-	// quit if the input is wrong
-	if realmName != preflightRealm {
-		return Profile{}, false
+	var authenticator string
+	for _, auth := range helpers.Config.Authenticators {
+		if auth.Name == realmObj.Authenticator {
+			authenticator = auth.Type
+		}
 	}
 
 	// authenticate using the right authenticator
-	if preflightAuthenticator == "mock" {
-		return mock(username, password, getConfig(preflightAuthenticator, preflightRealm))
-	} else if preflightAuthenticator == "ldap" {
-		profile, ok := ldap(username, password, getConfig(preflightAuthenticator, preflightRealm))
+	if authenticator == "mock" {
+		return mock(username, password, getConfig(authenticator, preflightRealm))
+	} else if authenticator == "ldap" {
+		profile, ok := ldap(username, password, getConfig(authenticator, preflightRealm))
 		if !ok {
 			logger.Warning.Println("Login failed, Username or password wrong")
 			return Profile{}, false
 		}
-
-		// set the profile cookie
-		encoded, err := helpers.SecureCookie.Encode("x-idp-profile", profile)
-		if err != nil {
-			logger.Error.Println(err)
-			return Profile{}, false
-		}
-
-		http.SetCookie(*w, &http.Cookie{Name: "x-idp-profile", Value: encoded, Secure: false})
 
 		return profile, ok
 	}

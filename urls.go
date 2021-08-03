@@ -12,9 +12,8 @@ type path struct {
 }
 
 var routes []path = []path{
-	{"/", auth.Login},
-	//{"/logout", controllers.Logout},
+	{"/", auth.LoginForm},
+	{"/login/{realm}", auth.Login},
 	{"/consent", auth.Consent},
-	{"/preflight", controllers.GetAuthenticator},
-	{"/urls", controllers.Urls},
+	{"/preflight", controllers.Preflight},
 }

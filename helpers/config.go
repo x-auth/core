@@ -7,7 +7,8 @@ import (
 	"strings"
 )
 
-type realm struct {
+type Realm struct {
+	Name          string            `yaml:"name"`
 	Identifier    string            `yaml:"identifier"`
 	Authenticator string            `yaml:"authenticator"`
 	Default       bool              `yaml:"default"`
@@ -29,7 +30,7 @@ type conf struct {
 	RememberFor     int64           `yaml:"remember_for"`
 	SplitCharacters []string        `yaml:"split_characters"`
 	Authenticators  []authenticator `yaml:"authenticators"`
-	Realms          []realm         `yaml:"realms"`
+	Realms          []Realm         `yaml:"realms"`
 }
 
 var Config conf

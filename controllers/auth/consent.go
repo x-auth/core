@@ -6,7 +6,6 @@ import (
 	"github.com/ory/hydra-client-go/models"
 	"html/template"
 	"net/http"
-	"x-net.at/idp/authenticators"
 	"x-net.at/idp/helpers"
 	"x-net.at/idp/logger"
 )
@@ -38,38 +37,13 @@ func Consent(w http.ResponseWriter, request *http.Request) {
 		var grantScope = request.Form["grant_scope"]
 
 		// parse the remember form value to boolean
-		remember := (request.FormValue("remember") == "true")
+		remember := request.FormValue("remember") == "true"
 
 		// handle the session
 		session := &models.ConsentRequestSession{}
 		if helpers.Contains(grantScope, "profile") {
-			cookie, err := request.Cookie("x-idp-authenticator")
-			if err != nil {
-				logger.Error.Println(err)
-				helpers.Error(w, 500, "cookie error: "+err.Error())
-			}
-
-			value := make(map[string]string)
-			err = helpers.SecureCookie.Decode("x-idp-authenticator", cookie.Value, &value)
-			if err != nil {
-				logger.Error.Println(err)
-				helpers.Error(w, 500, "cookie error: "+err.Error())
-			}
-
-			// get the profile cookie for the ldap authenticator
-			ldapCookie, err := request.Cookie("x-idp-profile")
-			if err != nil {
-				logger.Warning.Println(err)
-				helpers.Error(w, 400, "Cookie error: "+err.Error())
-				return
-			}
-
-			// get the profile
-			profile := authenticators.GetProfile(value["authenticator"], consentGetResp.GetPayload().Subject, ldapCookie)
-			if profile.Email == "" {
-				logger.Error.Println("getProfile did not return anything, flow aborted!")
-				helpers.Error(w, 500, "An unknown error occured, please try again later")
-			}
+			// get the profile from the consent context
+			profile := consentGetResp.GetPayload().Context
 
 			session.IDToken = profile
 		}
