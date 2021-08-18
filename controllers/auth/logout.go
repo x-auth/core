@@ -1,5 +1,6 @@
-/*package auth
+package auth
 
+/*
 import (
 	"net/http"
 	"x-net.at/idp/helpers"

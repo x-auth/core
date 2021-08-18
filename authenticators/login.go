@@ -2,8 +2,11 @@ package authenticators
 
 import (
 	"strings"
+	"x-net.at/idp/authenticators/ldap"
+	"x-net.at/idp/authenticators/mock"
 	"x-net.at/idp/helpers"
 	"x-net.at/idp/logger"
+	"x-net.at/idp/models"
 )
 
 func getConfig(authenticator string, realmId string) map[string]string {
@@ -19,12 +22,12 @@ func getConfig(authenticator string, realmId string) map[string]string {
 	return nil
 }
 
-func Login(identifier string, password string, preflightRealm string) (Profile, bool) {
+func Login(identifier string, password string, preflightRealm string) (models.Profile, bool) {
 	// check if a valid split char is in the identifier
 	ok, splitChar := helpers.SliceContains(identifier, helpers.Config.SplitCharacters)
 	if !ok {
 		logger.Error.Println("No valid split character in identifier")
-		return Profile{}, false
+		return models.Profile{}, false
 	}
 
 	// split the identifier in username and realm
@@ -43,7 +46,7 @@ func Login(identifier string, password string, preflightRealm string) (Profile, 
 	// quit if the input is wrong
 	if realmName != realmObj.Identifier {
 		logger.Error.Println("realm did not match preflight: " + realmName + " " + realmObj.Identifier)
-		return Profile{}, false
+		return models.Profile{}, false
 	}
 
 	var authenticator string
@@ -55,16 +58,16 @@ func Login(identifier string, password string, preflightRealm string) (Profile, 
 
 	// authenticate using the right authenticator
 	if authenticator == "mock" {
-		return mock(username, password, getConfig(authenticator, preflightRealm))
+		return mock.Login(username, password, getConfig(authenticator, preflightRealm))
 	} else if authenticator == "ldap" {
-		profile, ok := ldap(username, password, getConfig(authenticator, preflightRealm))
+		profile, ok := ldap.Login(username, password, getConfig(authenticator, preflightRealm))
 		if !ok {
 			logger.Warning.Println("Login failed, Username or password wrong")
-			return Profile{}, false
+			return models.Profile{}, false
 		}
 
 		return profile, ok
 	}
 
-	return Profile{}, false
+	return models.Profile{}, false
 }
