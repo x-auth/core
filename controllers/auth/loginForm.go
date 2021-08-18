@@ -20,7 +20,7 @@ func LoginForm(w http.ResponseWriter, request *http.Request) {
 	hydraAdmin := helpers.GetAdmin()
 
 	// reject non get requests
-	if request.Method != http.MethodGet{
+	if request.Method != http.MethodGet {
 		helpers.Error(w, http.StatusMethodNotAllowed, "Error: This endpoint only accepts POST requests!")
 		return
 	}
@@ -73,5 +73,5 @@ func LoginForm(w http.ResponseWriter, request *http.Request) {
 		http.Redirect(w, request, *respLoginAccept.GetPayload().RedirectTo, http.StatusFound)
 		return
 	}
-	helpers.Render(w, "login.html", "base.html", LoginData{csrf.TemplateField(request), challenge_slice[0], false, ""})
+	helpers.Render(w, "login.html", "base.html", helpers.TemplateCtx{Controller: LoginData{csrf.TemplateField(request), challenge_slice[0], false, ""}})
 }

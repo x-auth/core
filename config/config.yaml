@@ -2,6 +2,8 @@
 host: localhost:8000
 # url of the hyda admin interface
 hydra_url: http://localhost:4445
+# base path of the idp (when used in proxied mode)
+base_path: /x-idp
 # time in seconds in which a user should be remembered
 remember_for: 3000
 

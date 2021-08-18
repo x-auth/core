@@ -6,14 +6,14 @@
       <i class="icon ion-ios-locked-outline"></i>
     </div>
     <input type="hidden" name="login-challenge" value="{{.Challenge}}">
-    {{.CSRFField}}
+    {{.Controller.CSRFField}}
     <div class="form-group">
       <input class="form-control {{if .Error}}is-invalid{{end}}" type="text" name="email" placeholder="Email">
     </div>
     <div class="form-group">
       <input type="password" name="password" class="form-control {{if .Error}}is-invalid{{end}}" placeholder="Password">
         <small id="passwordHelp" class="text-danger">
-          {{.Message}}
+          {{.Controller.Message}}
         </small>
     </div>
     <div class="form-check">

@@ -25,6 +25,7 @@ type authenticator struct {
 type conf struct {
 	Debug           bool
 	Host            string          `yaml:"host"`
+	BasePath        string          `yaml:"base_path"`
 	HydraURL        string          `yaml:"hydra_url"`
 	KratosURL       string          `yaml:"kratos_url"`
 	RememberFor     int64           `yaml:"remember_for"`

@@ -8,7 +8,13 @@ import (
 	"text/template"
 )
 
-func Render(w http.ResponseWriter, file string, basefile string, data interface{}) {
+type TemplateCtx struct {
+	Controller interface{}
+	BasePath   string
+}
+
+func Render(w http.ResponseWriter, file string, basefile string, data TemplateCtx) {
+	data.BasePath = Config.BasePath
 	if basefile == "" {
 		tmpl := template.Must(template.ParseFiles("templates/" + file))
 		err := tmpl.Execute(w, data)
@@ -44,7 +50,7 @@ func Error(w http.ResponseWriter, code int, message string) {
 	}
 
 	w.WriteHeader(code)
-	Render(w, "error.html", "base.html", errorInfo{code, message})
+	Render(w, "error.html", "base.html", TemplateCtx{Controller: errorInfo{code, message}})
 }
 
 func JsonError(w http.ResponseWriter, code int, message string) {

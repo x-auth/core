@@ -12,7 +12,7 @@ import (
 */
 
 func loginRedir(w http.ResponseWriter, request *http.Request, realm string) {
-	http.Redirect(w, request, "/login/"+realm, http.StatusTemporaryRedirect)
+	http.Redirect(w, request, helpers.Config.BasePath+"/login/"+realm, http.StatusTemporaryRedirect)
 }
 
 func Preflight(w http.ResponseWriter, request *http.Request) {

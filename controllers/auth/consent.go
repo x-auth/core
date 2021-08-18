@@ -124,6 +124,6 @@ func Consent(w http.ResponseWriter, request *http.Request) {
 			User           string
 			Client         string
 		}
-		helpers.Render(w, "consent.html", "base.html", ConsentData{csrf.TemplateField(request), challenge_slice[0], consentGetResp.GetPayload().RequestedScope, consentGetResp.GetPayload().Subject, consentGetResp.GetPayload().Client.ClientName})
+		helpers.Render(w, "consent.html", "base.html", helpers.TemplateCtx{Controller: ConsentData{csrf.TemplateField(request), challenge_slice[0], consentGetResp.GetPayload().RequestedScope, consentGetResp.GetPayload().Subject, consentGetResp.GetPayload().Client.ClientName}})
 	}
 }

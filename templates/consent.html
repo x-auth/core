@@ -1,10 +1,10 @@
 {{define "content"}}
     <form method="post" action="/consent">
-        <h3>{{.Client}} wants to access:</h3>
-        <input type="hidden" name="consent-challenge" value="{{.Challenge}}">
-        {{.CSRFField}}
+        <h3>{{.Controller.Client}} wants to access:</h3>
+        <input type="hidden" name="consent-challenge" value="{{.Controller.Challenge}}">
+        {{.Controller.CSRFField}}
         <ul class="grant-list">
-            {{range .RequestedScope}}
+            {{range .Controller.RequestedScope}}
                 <li>
                     <div class="form-check">
                         <input type="checkbox" id="{{.}}" value="{{.}}" name="grant_scope">

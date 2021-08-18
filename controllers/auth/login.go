@@ -19,7 +19,7 @@ func Login(w http.ResponseWriter, request *http.Request) {
 	ctx := request.Context()
 
 	// reject non post requests
-	if request.Method != http.MethodPost{
+	if request.Method != http.MethodPost {
 		helpers.Error(w, http.StatusMethodNotAllowed, "Error: This endpoint only accepts POST requests!")
 		return
 	}
@@ -42,9 +42,9 @@ func Login(w http.ResponseWriter, request *http.Request) {
 	}
 
 	profile, authOk := authenticators.Login(request.FormValue("email"), request.FormValue("password"), realm)
-	if !authOk{
+	if !authOk {
 		logger.Info.Println("login failed")
-		helpers.Render(w, "login.html", "base.html", LoginData{csrf.TemplateField(request), request.FormValue("login-challenge"), true, "username or password is wrong"})
+		helpers.Render(w, "login.html", "base.html", helpers.TemplateCtx{Controller: LoginData{csrf.TemplateField(request), request.FormValue("login-challenge"), true, "username or password is wrong"}})
 		return
 	}
 
@@ -70,7 +70,7 @@ func Login(w http.ResponseWriter, request *http.Request) {
 	loginAcceptParam.SetBody(&models.AcceptLoginRequest{
 		Subject:  &subject,
 		Remember: rememberMe,
-		Context: profile,
+		Context:  profile,
 	})
 
 	respLoginAccept, err := hydraAdmin.AcceptLoginRequest(loginAcceptParam)
