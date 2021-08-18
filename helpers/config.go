@@ -48,7 +48,7 @@ func LoadConfig() {
 		log.Fatal(err)
 	}
 
-	//set debug mode
+	//set debug mode and version
 	Config.Debug = true
 
 	// validate split characters
