@@ -1,5 +1,5 @@
 {{define "content"}}
-    <form method="post" action="/consent">
+    <form method="post" action="{{.BasePath}}/consent">
         <h3>{{.Controller.Client}} wants to access:</h3>
         <input type="hidden" name="consent-challenge" value="{{.Controller.Challenge}}">
         {{.Controller.CSRFField}}
