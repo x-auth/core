@@ -4,7 +4,6 @@ body{
 
 .login-dark {
     height:1010px;
-    background:#475d62 url(/static/star-sky.jpg);
     background-size:cover;
     position:relative;
 }
