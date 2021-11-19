@@ -1,8 +1,11 @@
 package models
 
 type Profile struct {
-	Id     string   `json:"id"`
-	Name   string   `json:"first_name"`
-	Email  string   `json:"email"`
-	Groups []string `json:"group"`
+	Name        string
+	FamilyName  string
+	GivenName   string
+	NickName    string
+	Picture     string
+	Email       string
+	PhoneNumber string
 }

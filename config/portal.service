@@ -1,5 +1,9 @@
 [Unit]
 Description=X-Identity-Provider
+After=network-online.target
+Wants=network-online.target
+Before=hydra.service
+PartOf=x-idp.target
 
 [Service]
 Type=simple
@@ -9,4 +13,4 @@ User=x-idp
 Group=x-idp
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=x-idp.target

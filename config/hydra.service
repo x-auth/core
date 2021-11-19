@@ -1,0 +1,18 @@
+[Unit]
+Description=Ory Hydra
+After=network-online.target
+Wants=network-online.target
+Before=x-idp.target
+PartOf=x-idp.target
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=3
+Group=x-idp
+User=x-idp
+ExecStart=/opt/x-idp/services/hydra serve all --config /opt/auth/hydra.yaml --dangerous-force-http
+WorkingDirectory=/opt/x-idp
+
+[Install]
+WantedBy=x-idp.target

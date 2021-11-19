@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"fmt"
 	"github.com/gorilla/csrf"
 	"github.com/ory/hydra-client-go/client/admin"
 	"github.com/ory/hydra-client-go/models"
@@ -41,12 +42,22 @@ func Consent(w http.ResponseWriter, request *http.Request) {
 
 		// handle the session
 		session := &models.ConsentRequestSession{}
-		if helpers.Contains(grantScope, "profile") {
-			// get the profile from the consent context
-			profile := consentGetResp.GetPayload().Context
+		profile := consentGetResp.GetPayload().Context
+		claims := helpers.GetClaims(grantScope)
 
-			session.IDToken = profile
+		var parsedProfile map[string]interface{}
+		switch t := profile.(type) {
+		default:
+			fmt.Printf("unexpected type %T\n", t) // %T prints whatever type t has
+		case map[string]interface{}:
+			parsedProfile = t
 		}
+
+		var IDToken = make(map[string]string)
+		for _, claim := range claims {
+			IDToken[claim] = parsedProfile[claim].(string)
+		}
+		session.IDToken = IDToken
 
 		consentAcceptBody := &models.AcceptConsentRequest{
 			GrantAccessTokenAudience: consentGetResp.GetPayload().RequestedAccessTokenAudience,
@@ -118,8 +129,10 @@ func Consent(w http.ResponseWriter, request *http.Request) {
 		}
 		// show the consent page
 		type ConsentData struct {
-			CSRFField      template.HTML
-			Challenge      string
+			CSRFField template.HTML
+			Challenge string
+			//TODO: remove openid from list of scopes to give consent and accept it by default
+			//Note: Should we deny the flow if openid is not requested?
 			RequestedScope models.StringSlicePipeDelimiter
 			User           string
 			Client         string

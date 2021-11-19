@@ -119,7 +119,7 @@ func Login(username string, password string, config map[string]string) (models.P
 		0, 15,
 		false,
 		"(dn=*)",
-		[]string{config["email"], config["name"], config["groups"]},
+		[]string{config["name"], config["family_name"], config["given_name"], config["nickname"], config["email"], config["phone_number"]},
 		nil,
 	)
 
@@ -138,8 +138,15 @@ func Login(username string, password string, config map[string]string) (models.P
 
 	// parse the ldap entry to the internal Profile struct
 	userAttrs := userSearchResult.Entries[0].Attributes
-	groups := getGroups(getAttr(userAttrs, config["groups"]))
-	profile := models.Profile{Id: userdn, Name: getAttr(userAttrs, config["name"])[0], Email: getAttr(userAttrs, config["email"])[0], Groups: groups}
+	//profile := models.Profile{Id: userdn, Name: getAttr(userAttrs, config["name"])[0], Email: getAttr(userAttrs, config["email"])[0], Groups: groups}
+	profile := models.Profile{
+		Name:        getAttr(userAttrs, config["name"])[0],
+		FamilyName:  getAttr(userAttrs, config["family_name"])[0],
+		GivenName:   getAttr(userAttrs, config["given_name"])[0],
+		NickName:    getAttr(userAttrs, config["nickname"])[0],
+		Email:       getAttr(userAttrs, config["nickname"])[0],
+		PhoneNumber: getAttr(userAttrs, config["nickname"])[0],
+	}
 
 	// auth successful, profile cookie is set in the http handler
 	return profile, true

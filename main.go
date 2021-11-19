@@ -17,6 +17,7 @@ func main() {
 	helpers.LoadConfig()
 
 	// init hydra
+	// TODO: Tell hydra that we only support scopes defined in mappers.go
 	err := helpers.InitHydra()
 	if err != nil {
 		log.Fatal(err)

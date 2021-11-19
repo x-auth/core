@@ -3,7 +3,6 @@ package controllers
 import (
 	"net/http"
 	"strings"
-	"log"
 	"x-net.at/idp/helpers"
 )
 
