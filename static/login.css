@@ -108,3 +108,11 @@ footer>.copyright{
 footer>.copyright>a{
     color: white;
 }
+
+.grant-list{
+    list-style-type: none;
+}
+
+.claim-list{
+    list-style-type: none;
+}

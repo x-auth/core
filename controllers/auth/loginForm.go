@@ -73,5 +73,5 @@ func LoginForm(w http.ResponseWriter, request *http.Request) {
 		http.Redirect(w, request, *respLoginAccept.GetPayload().RedirectTo, http.StatusFound)
 		return
 	}
-	helpers.Render(w, "login.html", "base.html", helpers.TemplateCtx{Controller: LoginData{csrf.TemplateField(request), challenge_slice[0], false, ""}})
+	helpers.Render(w, request.Header.Get("Accept-Language"), "login.html", "base.html", helpers.TemplateCtx{Controller: LoginData{csrf.TemplateField(request), challenge_slice[0], false, ""}})
 }

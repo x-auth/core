@@ -7,6 +7,7 @@ import (
 	"github.com/ory/hydra-client-go/models"
 	"html/template"
 	"net/http"
+	"strings"
 	"x-net.at/idp/helpers"
 	"x-net.at/idp/logger"
 )
@@ -55,7 +56,7 @@ func Consent(w http.ResponseWriter, request *http.Request) {
 
 		var IDToken = make(map[string]string)
 		for _, claim := range claims {
-			IDToken[claim] = parsedProfile[claim].(string)
+			IDToken[strings.ToLower(claim)] = parsedProfile[claim].(string)
 		}
 		session.IDToken = IDToken
 
@@ -81,6 +82,8 @@ func Consent(w http.ResponseWriter, request *http.Request) {
 		http.Redirect(w, request, *consentAcceptResp.GetPayload().RedirectTo, http.StatusFound)
 	} else {
 		// GET Handler
+		// get the language
+		lang := request.Header.Get("Accept-Language")
 		// get the context
 		ctx := request.Context()
 		defer ctx.Done()
@@ -133,10 +136,22 @@ func Consent(w http.ResponseWriter, request *http.Request) {
 			Challenge string
 			//TODO: remove openid from list of scopes to give consent and accept it by default
 			//Note: Should we deny the flow if openid is not requested?
-			RequestedScope models.StringSlicePipeDelimiter
+			RequestedScope map[string][]string
 			User           string
 			Client         string
 		}
-		helpers.Render(w, "consent.html", "base.html", helpers.TemplateCtx{Controller: ConsentData{csrf.TemplateField(request), challenge_slice[0], consentGetResp.GetPayload().RequestedScope, consentGetResp.GetPayload().Subject, consentGetResp.GetPayload().Client.ClientName}})
+
+		var relevantScopes = make(map[string][]string)
+		for _, scope := range consentGetResp.GetPayload().RequestedScope {
+			if scope != "openid" {
+				if lang == "de" {
+					relevantScopes[scope] = helpers.ScopeClaimMapperGerman[scope]
+				} else {
+					relevantScopes[scope] = helpers.ScopeClaimMapperEnglish[scope]
+				}
+			}
+		}
+
+		helpers.Render(w, lang, "consent.html", "base.html", helpers.TemplateCtx{Controller: ConsentData{csrf.TemplateField(request), challenge_slice[0], relevantScopes, consentGetResp.GetPayload().Subject, consentGetResp.GetPayload().Client.ClientName}})
 	}
 }

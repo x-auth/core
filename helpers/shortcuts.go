@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 	"text/template"
 )
 
@@ -13,16 +14,25 @@ type TemplateCtx struct {
 	BasePath   string
 }
 
-func Render(w http.ResponseWriter, file string, basefile string, data TemplateCtx) {
+func mainLang(lang string) string {
+	if strings.Contains(lang, ",") {
+		return strings.Split(lang, ",")[0]
+	} else {
+		return lang
+	}
+}
+
+func Render(w http.ResponseWriter, lang string, file string, basefile string, data TemplateCtx) {
+	fmt.Println(lang)
 	data.BasePath = Config.BasePath
 	if basefile == "" {
-		tmpl := template.Must(template.ParseFiles("templates/" + file))
+		tmpl := template.Must(template.ParseFiles("templates/" + mainLang(lang) + "/" + file))
 		err := tmpl.Execute(w, data)
 		if err != nil {
 			log.Println(err)
 		}
 	} else {
-		tmpl := template.Must(template.ParseFiles("templates/"+file, "templates/"+basefile))
+		tmpl := template.Must(template.ParseFiles("templates/"+mainLang(lang)+"/"+file, "templates/"+basefile))
 		err := tmpl.ExecuteTemplate(w, "base", data)
 		if err != nil {
 			fmt.Println(err)
@@ -50,7 +60,7 @@ func Error(w http.ResponseWriter, code int, message string) {
 	}
 
 	w.WriteHeader(code)
-	Render(w, "error.html", "base.html", TemplateCtx{Controller: errorInfo{code, message}})
+	Render(w, "en", "error.html", "base.html", TemplateCtx{Controller: errorInfo{code, message}})
 }
 
 func JsonError(w http.ResponseWriter, code int, message string) {
