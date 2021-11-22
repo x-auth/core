@@ -11,7 +11,7 @@ Restart=always
 RestartSec=3
 Group=x-idp
 User=x-idp
-ExecStart=/opt/x-idp/services/hydra serve all --config /opt/auth/hydra.yaml --dangerous-force-http
+ExecStart=/opt/x-idp/services/hydra serve all --config /etc/idp/hydra.yaml --dangerous-force-http
 WorkingDirectory=/opt/x-idp
 
 [Install]

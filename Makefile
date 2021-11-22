@@ -28,7 +28,7 @@ setup:
 	tr -dc 'a-z0-9!@#$%^&*(-_=+)' < /dev/urandom | head -c50 > $(workingDir)/system/secret.key
 	cp ./config/portal.service $(systemdDir)
 	cp ./config/hydra.service $(systemdDir)
-	cp ./config/x-idp.service $(systemdDir)
+	cp ./config/x-idp.target $(systemdDir)
 	mkdir -p $(configDir)
 	cp	./config/config.yaml $(configDir)
 	systemctl daemon-reload
