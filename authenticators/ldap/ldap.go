@@ -168,8 +168,8 @@ func Login(username string, password string, config map[string]string) (models.P
 		FamilyName:  getAttr(userAttrs, config["family_name"])[0],
 		GivenName:   getAttr(userAttrs, config["given_name"])[0],
 		NickName:    getAttr(userAttrs, config["nickname"])[0],
-		Email:       getAttr(userAttrs, config["nickname"])[0],
-		PhoneNumber: getAttr(userAttrs, config["nickname"])[0],
+		Email:       getAttr(userAttrs, config["mail"])[0],
+		PhoneNumber: getAttr(userAttrs, config["phone_number"])[0],
 	}
 
 	// auth successful, profile cookie is set in the http handler
