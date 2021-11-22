@@ -163,6 +163,7 @@ func Login(username string, password string, config map[string]string) (models.P
 	// parse the ldap entry to the internal Profile struct
 	userAttrs := userSearchResult.Entries[0].Attributes
 	//profile := models.Profile{Id: userdn, Name: getAttr(userAttrs, config["name"])[0], Email: getAttr(userAttrs, config["email"])[0], Groups: groups}
+        fmt.Println(getAttr(userAttrs, config["phone_number"]))
 	profile := models.Profile{
 		Name:        getAttr(userAttrs, config["name"])[0],
 		FamilyName:  getAttr(userAttrs, config["family_name"])[0],
