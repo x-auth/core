@@ -168,7 +168,7 @@ func Login(username string, password string, config map[string]string) (models.P
 		FamilyName:  getAttr(userAttrs, config["family_name"])[0],
 		GivenName:   getAttr(userAttrs, config["given_name"])[0],
 		NickName:    getAttr(userAttrs, config["nickname"])[0],
-		Email:       getAttr(userAttrs, config["mail"])[0],
+		Email:       getAttr(userAttrs, config["email"])[0],
 		PhoneNumber: getAttr(userAttrs, config["phone_number"])[0],
 	}
 
