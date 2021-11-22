@@ -31,7 +31,6 @@ import (
 	"github.com/ory/hydra-client-go/models"
 	"html/template"
 	"net/http"
-	"strings"
 	"x-net.at/idp/helpers"
 	"x-net.at/idp/logger"
 )
@@ -80,7 +79,7 @@ func Consent(w http.ResponseWriter, request *http.Request) {
 
 		var IDToken = make(map[string]string)
 		for _, claim := range claims {
-			IDToken[strings.ToLower(claim)] = parsedProfile[claim].(string)
+			IDToken[helpers.ToSnakeCase(claim)] = parsedProfile[claim].(string)
 		}
 		session.IDToken = IDToken
 
