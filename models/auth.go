@@ -32,4 +32,5 @@ type Profile struct {
 	Picture     string
 	Email       string
 	PhoneNumber string
+	Groups      []string
 }

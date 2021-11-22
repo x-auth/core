@@ -28,7 +28,8 @@ var ScopeClaimMapper = map[string][]string{
 	"profile": []string{"Name", "FamilyName", "GivenName", "NickName", "Picture"},
 	"email":   []string{"Email"},
 	//"address": []string{"address"}, To be implemented later
-	"phone": []string{"PhoneNumber"},
+	"phone":  []string{"PhoneNumber"},
+	"groups": []string{"Groups"},
 }
 
 var ScopeClaimMapperGerman = map[string][]string{

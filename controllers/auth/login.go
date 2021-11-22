@@ -50,7 +50,6 @@ func Login(w http.ResponseWriter, request *http.Request) {
 
 	//get the login challenge
 	challenge := request.FormValue("login-challenge")
-
 	// accept the login request with hydra admin
 	loginGetParam := admin.NewGetLoginRequestParams()
 	loginGetParam.SetLoginChallenge(challenge)
