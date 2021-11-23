@@ -26,11 +26,11 @@ package helpers
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"strings"
 	"text/template"
-	"x-net.at/idp/logger"
 )
 
 type TemplateCtx struct {
@@ -58,7 +58,7 @@ func Render(w http.ResponseWriter, lang string, file string, basefile string, da
 		tmpl := template.Must(template.ParseFiles("templates/"+mainLang(lang)+"/"+file, "templates/"+basefile))
 		err := tmpl.ExecuteTemplate(w, "base", data)
 		if err != nil {
-			logger.Warning.Println(err)
+			fmt.Println(err)
 		}
 	}
 }
