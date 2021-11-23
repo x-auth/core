@@ -25,7 +25,6 @@
 package auth
 
 import (
-	"fmt"
 	"github.com/gorilla/csrf"
 	"github.com/ory/hydra-client-go/client/admin"
 	"github.com/ory/hydra-client-go/models"
@@ -69,10 +68,11 @@ func Consent(w http.ResponseWriter, request *http.Request) {
 		profile := consentGetResp.GetPayload().Context
 		claims := helpers.GetClaims(grantScope)
 
+		// compile time cast check because go does not provide a good way for that
 		var parsedProfile map[string]interface{}
 		switch t := profile.(type) {
 		default:
-			fmt.Printf("unexpected type %T\n", t) // %T prints whatever type t has
+			// TODO: Handle fatal error
 		case map[string]interface{}:
 			parsedProfile = t
 		}

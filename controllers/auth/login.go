@@ -52,9 +52,9 @@ func Login(w http.ResponseWriter, request *http.Request) {
 	challenge := request.FormValue("login-challenge")
 	// accept the login request with hydra admin
 	loginGetParam := admin.NewGetLoginRequestParams()
-	loginGetParam.SetLoginChallenge(challenge)
+	loginGetParam.SetLoginChallenge(challenge) -
 
-	_, err = hydraAdmin.GetLoginRequest(loginGetParam)
+		_, err = hydraAdmin.GetLoginRequest(loginGetParam)
 	if err != nil {
 		helpers.Error(w, 500, "Failed to get login request: "+err.Error())
 		return
