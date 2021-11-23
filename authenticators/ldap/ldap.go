@@ -30,30 +30,10 @@ import (
 	ldap3 "github.com/go-ldap/ldap/v3"
 	"net/http"
 	"strconv"
-	"strings"
 	"x-net.at/idp/helpers"
 	"x-net.at/idp/logger"
 	"x-net.at/idp/models"
 )
-
-// helper to get ldap attribute by name
-func getAttr(attrs []*ldap3.EntryAttribute, name string) []string {
-	for _, attr := range attrs {
-		if attr.Name == name {
-			return attr.Values
-		}
-	}
-	return nil
-}
-
-// helper to get all group cns as strings
-func getGroups(groupCNs []string) []string {
-	var groups []string
-	for _, groupCN := range groupCNs {
-		groups = append(groups, strings.Split(strings.Split(groupCN, ",")[0], "=")[1])
-	}
-	return groups
-}
 
 func Login(username string, password string, config map[string]string) (models.Profile, bool) {
 	useTLS, err := strconv.ParseBool(config["use_tls"])
