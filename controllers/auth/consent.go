@@ -25,6 +25,7 @@
 package auth
 
 import (
+	"fmt"
 	"github.com/gorilla/csrf"
 	"github.com/ory/hydra-client-go/client/admin"
 	"github.com/ory/hydra-client-go/models"
@@ -59,6 +60,8 @@ func Consent(w http.ResponseWriter, request *http.Request) {
 
 		// grant the consent request
 		var grantScope = request.Form["grant_scope"]
+
+		fmt.Println(grantScope)
 
 		// parse the remember form value to boolean
 		remember := request.FormValue("remember") == "true"
