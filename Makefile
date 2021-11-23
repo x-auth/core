@@ -18,6 +18,7 @@ install:
 	cp -r ./templates $(workingDir)
 
 update:
+	build
 	service x-idp stop
 	install
 	service x-idp start
