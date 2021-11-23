@@ -1,7 +1,6 @@
 package ldap
 
 import (
-	"fmt"
 	ldap3 "github.com/go-ldap/ldap/v3"
 	"strings"
 )
@@ -21,7 +20,6 @@ func getGroups(groupCNs []string) []string {
 	for _, groupCN := range groupCNs {
 		parsedArray := strings.Split(strings.Split(groupCN, ",")[0], "=")
 
-		fmt.Println(len(parsedArray))
 		if len(parsedArray) <= 1 {
 			continue
 		}
