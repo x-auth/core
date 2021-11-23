@@ -20,7 +20,7 @@ func getGroups(groupCNs []string) []string {
 	for _, groupCN := range groupCNs {
 		parsedArray := strings.Split(strings.Split(groupCN, ",")[0], "=")
 
-		if len(parsedArray) == 0 {
+		if len(parsedArray) <= 1 {
 			continue
 		}
 
