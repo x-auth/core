@@ -34,8 +34,8 @@ function banner(){
 ░░░░░ ░░░░░            ░░░░░ ░░░░░░░░░░   ░░░░░        
 `
     console.log(bannerText, "color: #bada55")
-    console.log("WARNING: Never paste text from emails or text you found in the internet in this console!!", "color: #ff0000")
-    console.log("This can cause extreme security risks!!", "color: #ff0000")
+    console.log("WARNING: Never paste text from emails or text you found in the internet in this console!!")
+    console.log("This can cause extreme security risks!!")
 
 }
 
