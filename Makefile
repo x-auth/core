@@ -17,6 +17,11 @@ install:
 	cp -r ./static $(workingDir)
 	cp -r ./templates $(workingDir)
 
+update:
+	service x-idp stop
+	install
+	service x-idp start
+
 setup:
 	# set up the portal software
 	useradd x-idp -d $(workingDir)
