@@ -18,7 +18,11 @@ func getAttr(attrs []*ldap3.EntryAttribute, name string) []string {
 func getGroups(groupCNs []string) []string {
 	var groups []string
 	for _, groupCN := range groupCNs {
+		// fatal
 		groups = append(groups, strings.Split(strings.Split(groupCN, ",")[0], "=")[1])
+		if recover() != nil {
+			return []string{""}
+		}
 	}
 	return groups
 }
