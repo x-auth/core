@@ -77,14 +77,14 @@ func Consent(w http.ResponseWriter, request *http.Request) {
 			parsedProfile = t
 		}
 
-		var IDToken = make(map[string]string)
+		var IDToken = make(map[string]interface{})
 		for _, claim := range claims {
 			IDToken[helpers.ToSnakeCase(claim)] = parsedProfile[claim].(string)
 		}
 		session.IDToken = IDToken
 
 		if helpers.Contains(consentGetResp.GetPayload().RequestedScope, "email") {
-			IDToken["email_verified"] = "true"
+			IDToken["email_verified"] = true
 		}
 
 		// always append the openid grant scope
