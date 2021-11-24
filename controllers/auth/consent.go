@@ -83,6 +83,10 @@ func Consent(w http.ResponseWriter, request *http.Request) {
 		}
 		session.IDToken = IDToken
 
+		if helpers.Contains(consentGetResp.GetPayload().RequestedScope, "email") {
+			IDToken["email_verified"] = "true"
+		}
+
 		// always append the openid grant scope
 		if helpers.Contains(consentGetResp.GetPayload().RequestedScope, "openid") {
 			grantScope = append(grantScope, "openid")
