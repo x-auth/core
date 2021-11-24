@@ -25,6 +25,7 @@
 package auth
 
 import (
+	"fmt"
 	"github.com/gorilla/csrf"
 	"github.com/ory/hydra-client-go/client/admin"
 	"github.com/ory/hydra-client-go/models"
@@ -82,6 +83,8 @@ func Consent(w http.ResponseWriter, request *http.Request) {
 			IDToken[helpers.ToSnakeCase(claim)] = parsedProfile[claim].(string)
 		}
 		session.IDToken = IDToken
+
+		fmt.Println(grantScope)
 
 		consentAcceptBody := &models.AcceptConsentRequest{
 			GrantAccessTokenAudience: consentGetResp.GetPayload().RequestedAccessTokenAudience,
