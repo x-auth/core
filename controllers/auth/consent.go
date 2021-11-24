@@ -25,7 +25,6 @@
 package auth
 
 import (
-	"fmt"
 	"github.com/gorilla/csrf"
 	"github.com/ory/hydra-client-go/client/admin"
 	"github.com/ory/hydra-client-go/models"
@@ -84,7 +83,8 @@ func Consent(w http.ResponseWriter, request *http.Request) {
 		}
 		session.IDToken = IDToken
 
-		fmt.Println(grantScope)
+		// always append the openid grant scope
+		grantScope = append(grantScope, "openid")
 
 		consentAcceptBody := &models.AcceptConsentRequest{
 			GrantAccessTokenAudience: consentGetResp.GetPayload().RequestedAccessTokenAudience,
