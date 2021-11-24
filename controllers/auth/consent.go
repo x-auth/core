@@ -84,7 +84,9 @@ func Consent(w http.ResponseWriter, request *http.Request) {
 		session.IDToken = IDToken
 
 		// always append the openid grant scope
-		grantScope = append(grantScope, "openid")
+		if helpers.Contains(consentGetResp.GetPayload().RequestedScope, "openid") {
+			grantScope = append(grantScope, "openid")
+		}
 
 		consentAcceptBody := &models.AcceptConsentRequest{
 			GrantAccessTokenAudience: consentGetResp.GetPayload().RequestedAccessTokenAudience,
