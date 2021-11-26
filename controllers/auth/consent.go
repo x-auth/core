@@ -71,7 +71,7 @@ func Consent(w http.ResponseWriter, request *http.Request) {
 		// handle the case that login was skipped
 		if len(profile.(map[string]interface{})) == 0 {
 			fmt.Println("old claims:")
-			fmt.Println(consentGetResp.GetPayload().OidcContext.IDTokenHintClaims)
+			fmt.Println(consentGetResp.GetPayload().OidcContext)
 		}
 
 		claims := helpers.GetClaims(grantScope)
