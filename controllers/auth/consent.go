@@ -67,6 +67,8 @@ func Consent(w http.ResponseWriter, request *http.Request) {
 		// handle the session
 		session := &models.ConsentRequestSession{}
 		profile := consentGetResp.GetPayload().Context
+		fmt.Println(profile)
+
 		claims := helpers.GetClaims(grantScope)
 
 		// compile time cast check because go does not provide a good way for that
@@ -80,7 +82,6 @@ func Consent(w http.ResponseWriter, request *http.Request) {
 
 		var IDToken = make(map[string]interface{})
 		for _, claim := range claims {
-			fmt.Println(IDToken["claim"], parsedProfile[claim])
 			IDToken[helpers.ToSnakeCase(claim)] = parsedProfile[claim].(string)
 		}
 		session.IDToken = IDToken

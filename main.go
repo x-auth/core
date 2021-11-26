@@ -31,6 +31,7 @@ import (
 	"net/http"
 	"x-net.at/idp/helpers"
 	"x-net.at/idp/logger"
+	"x-net.at/idp/usercache"
 )
 
 func main() {
@@ -39,6 +40,9 @@ func main() {
 
 	// load the config
 	helpers.LoadConfig()
+
+	// set up the usercache
+	usercache.Init()
 
 	// init hydra
 	// TODO: Tell hydra that we only support scopes defined in mappers.go
