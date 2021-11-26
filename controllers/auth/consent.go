@@ -25,6 +25,7 @@
 package auth
 
 import (
+	"fmt"
 	"github.com/gorilla/csrf"
 	"github.com/ory/hydra-client-go/client/admin"
 	"github.com/ory/hydra-client-go/models"
@@ -79,6 +80,7 @@ func Consent(w http.ResponseWriter, request *http.Request) {
 
 		var IDToken = make(map[string]interface{})
 		for _, claim := range claims {
+			fmt.Println(parsedProfile[claim])
 			IDToken[helpers.ToSnakeCase(claim)] = parsedProfile[claim].(string)
 		}
 		session.IDToken = IDToken
