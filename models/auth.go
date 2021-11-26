@@ -33,4 +33,5 @@ type Profile struct {
 	Email       string
 	PhoneNumber string
 	Groups      []string
+	Remember    bool
 }

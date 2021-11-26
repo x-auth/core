@@ -25,7 +25,6 @@
 package auth
 
 import (
-	"fmt"
 	"github.com/gorilla/csrf"
 	"github.com/ory/hydra-client-go/client/admin"
 	"github.com/ory/hydra-client-go/models"
@@ -67,13 +66,6 @@ func Consent(w http.ResponseWriter, request *http.Request) {
 		// handle the session
 		session := &models.ConsentRequestSession{}
 		profile := consentGetResp.GetPayload().Context
-
-		// handle the case that login was skipped
-		if len(profile.(map[string]interface{})) == 0 {
-			fmt.Println("old claims:")
-			fmt.Println(consentGetResp.GetPayload().OidcContext)
-		}
-
 		claims := helpers.GetClaims(grantScope)
 
 		// compile time cast check because go does not provide a good way for that
@@ -172,13 +164,12 @@ func Consent(w http.ResponseWriter, request *http.Request) {
 		}
 		// show the consent page
 		type ConsentData struct {
-			CSRFField template.HTML
-			Challenge string
-			//TODO: remove openid from list of scopes to give consent and accept it by default
-			//Note: Should we deny the flow if openid is not requested?
+			CSRFField      template.HTML
+			Challenge      string
 			RequestedScope map[string][]string
 			User           string
 			Client         string
+			ForceRemember  bool
 		}
 
 		var relevantScopes = make(map[string][]string)
@@ -192,6 +183,14 @@ func Consent(w http.ResponseWriter, request *http.Request) {
 			}
 		}
 
-		helpers.Render(w, lang, "consent.html", "base.html", helpers.TemplateCtx{Controller: ConsentData{csrf.TemplateField(request), challenge_slice[0], relevantScopes, consentGetResp.GetPayload().Subject, consentGetResp.GetPayload().Client.ClientName}})
+		payload := ConsentData{
+			csrf.TemplateField(request),
+			challenge_slice[0],
+			relevantScopes,
+			consentGetResp.GetPayload().Subject,
+			consentGetResp.GetPayload().Client.ClientName,
+			consentGetResp.GetPayload().Context.(map[string]interface{})["Remember"].(bool),
+		}
+		helpers.Render(w, lang, "consent.html", "base.html", helpers.TemplateCtx{Controller: payload})
 	}
 }

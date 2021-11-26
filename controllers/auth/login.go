@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"fmt"
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
 	"github.com/ory/hydra-client-go/client/admin"
@@ -47,6 +48,10 @@ func Login(w http.ResponseWriter, request *http.Request) {
 		helpers.Render(w, request.Header.Get("Accept-Language"), "login.html", "base.html", helpers.TemplateCtx{Controller: LoginData{csrf.TemplateField(request), request.FormValue("login-challenge"), true, "username or password is wrong"}})
 		return
 	}
+
+	// set remember in context
+	profile.Remember = rememberMe
+	fmt.Println("profile", profile)
 
 	//get the login challenge
 	challenge := request.FormValue("login-challenge")
