@@ -36,20 +36,18 @@ import (
 )
 
 func Login(username string, password string, config map[string]string) (models.Profile, bool) {
-        fmt.Println(username)
-	useTLS, err := strconv.ParseBool(config["use_tls"])
-	if err != nil {
-		logger.Error.Println(err.Error())
-		return models.Profile{}, false
+	// get the encryption method from the config
+	var useTLS, enableSSL bool
+	if config["encryption"] == "tls"{
+		useTLS = true
+		enableSSL = false
+	} else if config["encryption"] == "ssl"{
+		useTLS = false
+		enableSSL = true
+	} else {
+		useTLS = false
+		enableSSL = false
 	}
-
-	enableSSL, err := strconv.ParseBool(config["enable_ssl"])
-	if err != nil {
-		logger.Error.Println(err.Error())
-		return models.Profile{}, false
-	}
-
-	fmt.Println("enableSSL", enableSSL)
 
 	// check if ssl/tls cert verification should be skipped
 	var conn *ldap3.Conn
