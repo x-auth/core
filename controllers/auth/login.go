@@ -38,9 +38,6 @@ func Login(w http.ResponseWriter, request *http.Request) {
 
 	// convert the remember me form data to bool
 	var rememberMe bool = false
-	if request.FormValue("remember") == "true" {
-		rememberMe = true
-	}
 
 	profile, authOk := authenticators.Login(request.FormValue("email"), request.FormValue("password"), realm)
 	if !authOk {

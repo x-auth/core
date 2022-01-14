@@ -41,19 +41,6 @@
                 </div>
             </div>
         </div>
-        <p>
-            Do you want to be asked next time when this application wants to access your data? The application will
-            not be able to ask for more permissions without your consent!
-        </p>
-        <div class="form-check">
-            {{if .Controller.ForceRemember}}
-                <input type="checkbox" class="form-check-input" id="remember" name="remember" value="true" checked="checked" readonly="readonly">
-                <label class="form-check-label" for="remember">Don´t ask again (Fixed because you selected to be remembered)</label>
-            {{else}}
-                <input type="checkbox" class="form-check-input" id="remember" name="remember" value="true">
-                <label class="form-check-label" for="remember">Don´t ask again</label>
-            {{end}}
-        </div>
         <div class="align-items-center flex-row-reverse row mt-1 sm-gutters">
             <div class="col-auto ml-auto">
                 <button class="btn btn-tertiary" type="submit">Consent</button>

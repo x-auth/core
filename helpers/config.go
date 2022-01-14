@@ -74,7 +74,7 @@ func LoadConfig() {
 	}
 
 	//set debug mode and version
-	Config.Debug = true
+	Config.Debug = false
 
 	// validate split characters
 	punctuations := ".,:;-!?"

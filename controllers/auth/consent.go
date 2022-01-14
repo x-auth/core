@@ -61,7 +61,7 @@ func Consent(w http.ResponseWriter, request *http.Request) {
 		var grantScope = request.Form["grant_scope"]
 
 		// parse the remember form value to boolean
-		remember := request.FormValue("remember") == "true"
+		remember := false
 
 		// handle the session
 		session := &models.ConsentRequestSession{}

@@ -36,11 +36,20 @@ import (
 )
 
 func Login(username string, password string, config map[string]string) (models.Profile, bool) {
+        fmt.Println(username)
 	useTLS, err := strconv.ParseBool(config["use_tls"])
 	if err != nil {
 		logger.Error.Println(err.Error())
 		return models.Profile{}, false
 	}
+
+	enableSSL, err := strconv.ParseBool(config["enable_ssl"])
+	if err != nil {
+		logger.Error.Println(err.Error())
+		return models.Profile{}, false
+	}
+
+	fmt.Println("enableSSL", enableSSL)
 
 	// check if ssl/tls cert verification should be skipped
 	var conn *ldap3.Conn
@@ -65,7 +74,7 @@ func Login(username string, password string, config map[string]string) (models.P
 			logger.Error.Println(err.Error())
 			return models.Profile{}, false
 		}
-	} else {
+	} else if enableSSL  {
 		// configure and setup ssl
 		tlsConf := &tls.Config{InsecureSkipVerify: skipVerify}
 		conn, err = ldap3.DialTLS("tcp", config["host"], tlsConf)
@@ -74,12 +83,18 @@ func Login(username string, password string, config map[string]string) (models.P
 			logger.Error.Println(err.Error())
 			return models.Profile{}, false
 		}
+	} else {
+		conn, err = ldap3.Dial("tcp", config["host"])
+		if err != nil {
+			logger.Error.Println(err.Error())
+                        return models.Profile{}, false
+		}
 	}
 
 	// bind with the bind dn
 	err = conn.Bind(config["bind_dn"], config["bind_pw"])
 	if err != nil {
-		logger.Error.Println(err.Error())
+		logger.Error.Println("connect bind failed: ", err.Error())
 		return models.Profile{}, false
 	}
 
@@ -87,13 +102,13 @@ func Login(username string, password string, config map[string]string) (models.P
 	searchRequest := ldap3.NewSearchRequest(
 		config["base_dn"],
 		ldap3.ScopeWholeSubtree, ldap3.NeverDerefAliases,
-		0, 15,
+		2, 15,
 		false,
 		fmt.Sprintf("(&%s(%s=%s))", config["filter"], config["email"], username),
 		[]string{"dn"},
 		nil,
 	)
-
+	logger.Info.Println("User search request: ", searchRequest)
 	// run the search
 	searchResult, err := conn.Search(searchRequest)
 	if err != nil {
@@ -101,9 +116,10 @@ func Login(username string, password string, config map[string]string) (models.P
 		return models.Profile{}, false
 	}
 
-	// get the first Entry of the searchResult
-	if len(searchResult.Entries) != 1 {
-		logger.Error.Println("User does not exist or too many entries returned")
+	// get the first Entry of the searchResulti
+	numEntries := len(searchResult.Entries)
+	if numEntries != 1 {
+		logger.Error.Println("User does not exist or too many entries returned: ", numEntries)
 		return models.Profile{}, false
 	}
 	userdn := searchResult.Entries[0].DN
@@ -111,7 +127,7 @@ func Login(username string, password string, config map[string]string) (models.P
 	// Bind as the user to verify password
 	err = conn.Bind(userdn, password)
 	if err != nil {
-		logger.Error.Println(err.Error())
+		logger.Error.Println("User bind failed: ", err.Error())
 		return models.Profile{}, false
 	}
 
@@ -120,12 +136,14 @@ func Login(username string, password string, config map[string]string) (models.P
 		userdn,
 		ldap3.ScopeBaseObject,
 		ldap3.NeverDerefAliases,
-		0, 15,
+		2, 15,
 		false,
-		"(dn=*)",
+		"(objectClass=*)",
 		[]string{config["name"], config["family_name"], config["given_name"], config["nickname"], config["email"], config["phone_number"]},
 		nil,
 	)
+
+	logger.Info.Println("Attribute search request: ", userSearchRequest)
 
 	// run the search
 	userSearchResult, err := conn.Search(userSearchRequest)

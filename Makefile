@@ -17,6 +17,9 @@ install:
 	cp -r ./static $(workingDir)
 	cp -r ./templates $(workingDir)
 
+restart:
+	service x-idp stop && make install && service x-idp start
+
 update:
 	build
 	service x-idp stop

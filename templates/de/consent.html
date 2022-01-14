@@ -31,19 +31,6 @@
                 </div>
             </div>
         </div>
-        <p>
-            Möchten Sie das nächste Mal wenn diese Anwendung Zugriff auf diese Daten will erneut gefragt werden?
-            Die Anwendung kann ohne Ihre Zustimmung niemals auf zusätzliche Daten in Ihrem Konto zugreifen!
-        </p>
-        <div class="form-check">
-            {{if .Controller.ForceRemember}}
-                <input type="checkbox" class="form-check-input" id="remember" name="remember" value="true" checked="checked" disabled>
-                <label class="form-check-label" for="remember">Nicht erneut fragen (Fix weil Sie eingeloggt bleiben)</label>
-            {{else}}
-                <input type="checkbox" class="form-check-input" id="remember" name="remember" value="true">
-                <label class="form-check-label" for="remember">Nicht erneut fragen</label>
-            {{end}}
-        </div>
         <div class="align-items-center flex-row-reverse row mt-1 sm-gutters">
             <div class="col-auto ml-auto">
                 <button class="btn btn-tertiary" type="submit">zustimmen</button>
