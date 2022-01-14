@@ -36,12 +36,13 @@ import (
 )
 
 func Login(username string, password string, config map[string]string) (models.Profile, bool) {
+	logger.Log.Debug("Login request started by user " + username)
 	// get the encryption method from the config
 	var useTLS, enableSSL bool
-	if config["encryption"] == "tls"{
+	if config["encryption"] == "tls" {
 		useTLS = true
 		enableSSL = false
-	} else if config["encryption"] == "ssl"{
+	} else if config["encryption"] == "ssl" {
 		useTLS = false
 		enableSSL = true
 	} else {
@@ -53,7 +54,7 @@ func Login(username string, password string, config map[string]string) (models.P
 	var conn *ldap3.Conn
 	skipVerify, err := strconv.ParseBool(config["skip_verify"])
 	if err != nil {
-		logger.Error.Println(err.Error())
+		logger.Log.Error(err.Error())
 		return models.Profile{}, false
 	}
 
@@ -62,37 +63,37 @@ func Login(username string, password string, config map[string]string) (models.P
 		// Dial without encryption
 		conn, err = ldap3.DialURL("ldap://" + config["host"])
 		if err != nil {
-			logger.Error.Println(err.Error())
+			logger.Log.Error(err.Error())
 			return models.Profile{}, false
 		}
 
 		// upgrade connection to TLS
 		err = conn.StartTLS(&tls.Config{InsecureSkipVerify: skipVerify})
 		if err != nil {
-			logger.Error.Println(err.Error())
+			logger.Log.Error(err.Error())
 			return models.Profile{}, false
 		}
-	} else if enableSSL  {
+	} else if enableSSL {
 		// configure and setup ssl
 		tlsConf := &tls.Config{InsecureSkipVerify: skipVerify}
 		conn, err = ldap3.DialTLS("tcp", config["host"], tlsConf)
 
 		if err != nil {
-			logger.Error.Println(err.Error())
+			logger.Log.Error(err.Error())
 			return models.Profile{}, false
 		}
 	} else {
 		conn, err = ldap3.Dial("tcp", config["host"])
 		if err != nil {
-			logger.Error.Println(err.Error())
-                        return models.Profile{}, false
+			logger.Log.Error(err.Error())
+			return models.Profile{}, false
 		}
 	}
 
 	// bind with the bind dn
 	err = conn.Bind(config["bind_dn"], config["bind_pw"])
 	if err != nil {
-		logger.Error.Println("connect bind failed: ", err.Error())
+		logger.Log.Error("connect bind failed: ", err.Error())
 		return models.Profile{}, false
 	}
 
@@ -106,18 +107,18 @@ func Login(username string, password string, config map[string]string) (models.P
 		[]string{"dn"},
 		nil,
 	)
-	logger.Info.Println("User search request: ", searchRequest)
+	logger.Log.Error("User search request: ", searchRequest)
 	// run the search
 	searchResult, err := conn.Search(searchRequest)
 	if err != nil {
-		logger.Error.Println(err.Error())
+		logger.Log.Error(err.Error())
 		return models.Profile{}, false
 	}
 
 	// get the first Entry of the searchResulti
 	numEntries := len(searchResult.Entries)
 	if numEntries != 1 {
-		logger.Error.Println("User does not exist or too many entries returned: ", numEntries)
+		logger.Log.Error("User does not exist or too many entries returned: ", numEntries)
 		return models.Profile{}, false
 	}
 	userdn := searchResult.Entries[0].DN
@@ -125,7 +126,7 @@ func Login(username string, password string, config map[string]string) (models.P
 	// Bind as the user to verify password
 	err = conn.Bind(userdn, password)
 	if err != nil {
-		logger.Error.Println("User bind failed: ", err.Error())
+		logger.Log.Error("User bind failed: ", err.Error())
 		return models.Profile{}, false
 	}
 
@@ -141,18 +142,18 @@ func Login(username string, password string, config map[string]string) (models.P
 		nil,
 	)
 
-	logger.Info.Println("Attribute search request: ", userSearchRequest)
+	logger.Log.Error("Attribute search request: ", userSearchRequest)
 
 	// run the search
 	userSearchResult, err := conn.Search(userSearchRequest)
 	if err != nil {
-		logger.Error.Println(err.Error())
+		logger.Log.Error(err.Error())
 		return models.Profile{}, false
 	}
 
 	// get the first Entry of the searchResult
 	if len(userSearchResult.Entries) != 1 {
-		logger.Error.Println("User does not exist or too many entries returned")
+		logger.Log.Error("User does not exist or too many entries returned")
 		return models.Profile{}, false
 	}
 
@@ -181,7 +182,7 @@ func getLdapProfile(cookie *http.Cookie) models.Profile {
 	value := new(models.Profile)
 	err := helpers.SecureCookie.Decode("x-idp-profile", cookie.Value, &value)
 	if err != nil {
-		logger.Error.Println(err)
+		logger.Log.Error(err)
 		return models.Profile{}
 	}
 

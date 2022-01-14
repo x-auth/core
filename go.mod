@@ -10,5 +10,6 @@ require (
 	github.com/jcelliott/lumber v0.0.0-20160324203708-dd349441af25 // indirect
 	github.com/ory/hydra-client-go v1.10.3
 	github.com/sdomino/scribble v0.0.0-20200707180004-3cc68461d505
+	github.com/sirupsen/logrus v1.4.2 // indirect
 	gopkg.in/yaml.v2 v2.4.0
 )

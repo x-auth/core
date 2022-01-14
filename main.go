@@ -34,11 +34,12 @@ import (
 )
 
 func main() {
-	// set up logging
-	logger.Init()
-
 	// load the config
 	helpers.LoadConfig()
+
+	// set up logging
+	logger.Init()
+	defer logger.Destroy()
 
 	// init hydra
 	// TODO: Tell hydra that we only support scopes defined in mappers.go
@@ -68,7 +69,8 @@ func main() {
 	helpers.InitSecureCookie()
 
 	// start the server
-	logger.Info.Println("X-IDP server is running on " + helpers.Config.Host + " press CTRL-C to quit")
+	logger.Log.Info("X-IDP server is running on " + helpers.Config.Host)
+	logger.Log.Debug("Press CTRL+C to quit")
 	err = http.ListenAndServe(helpers.Config.Host, CSRF(router))
 	if err != nil {
 		log.Fatal(err)

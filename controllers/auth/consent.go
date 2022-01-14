@@ -52,7 +52,7 @@ func Consent(w http.ResponseWriter, request *http.Request) {
 
 		consentGetResp, err := hydraAdmin.GetConsentRequest(consentGetParams)
 		if err != nil {
-			logger.Error.Println("Failed to get consent request, " + err.Error())
+			logger.Log.Error("Failed to get consent request, " + err.Error())
 			helpers.Error(w, 500, "Failed to get consent request: "+err.Error())
 			return
 		}
@@ -106,7 +106,7 @@ func Consent(w http.ResponseWriter, request *http.Request) {
 
 		consentAcceptResp, err := hydraAdmin.AcceptConsentRequest(consentAcceptParams)
 		if err != nil {
-			logger.Error.Println(err)
+			logger.Log.Error(err)
 			helpers.Error(w, 500, "Failed to accept consent Request: "+err.Error())
 			return
 		}
@@ -123,7 +123,7 @@ func Consent(w http.ResponseWriter, request *http.Request) {
 		// get the login challenge
 		challenge_slice, ok := request.URL.Query()["consent_challenge"]
 		if !ok || len(challenge_slice) < 1 {
-			logger.Warning.Println("Expected a login challenge but received none")
+			logger.Log.Warning("Expected a login challenge but received none")
 			helpers.Error(w, 400, "Expected a login challenge but received none")
 			return
 		}
@@ -135,7 +135,7 @@ func Consent(w http.ResponseWriter, request *http.Request) {
 
 		consentGetResp, err := hydraAdmin.GetConsentRequest(consentGetParams)
 		if err != nil {
-			logger.Error.Println("Failed to get consent request: " + err.Error())
+			logger.Log.Error("Failed to get consent request: " + err.Error())
 			helpers.Error(w, 500, "Failed to get consent request: "+err.Error())
 			return
 		}
@@ -154,7 +154,7 @@ func Consent(w http.ResponseWriter, request *http.Request) {
 
 			consentAcceptResp, err := hydraAdmin.AcceptConsentRequest(consentAcceptParams)
 			if err != nil {
-				logger.Error.Println("Failed to get consent request: " + err.Error())
+				logger.Log.Error("Failed to get consent request: " + err.Error())
 				helpers.Error(w, 500, "Failed to accept consent Request: "+err.Error())
 				return
 			}

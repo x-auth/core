@@ -53,6 +53,7 @@ type conf struct {
 	HydraURL        string          `yaml:"hydra_url"`
 	KratosURL       string          `yaml:"kratos_url"`
 	RememberFor     int64           `yaml:"remember_for"`
+	Logger          string          `yaml:"logger"`
 	SplitCharacters []string        `yaml:"split_characters"`
 	Authenticators  []authenticator `yaml:"authenticators"`
 	Realms          []Realm         `yaml:"realms"`

@@ -25,20 +25,44 @@
 package logger
 
 import (
-	"log"
+	"fmt"
+	"github.com/sirupsen/logrus"
 	"os"
+	"x-net.at/idp/helpers"
 )
 
-var (
-	Warning   *log.Logger
-	Info      *log.Logger
-	Error     *log.Logger
-	Debug *log.Logger
-)
+var Log *logrus.Logger
+var file os.File
+var fileEnabled bool = false
 
 func Init() {
-	Info = log.New(os.Stdout, "INFO: ", log.Ldate|log.Ltime)
-	Warning = log.New(os.Stdout, "WARNING: ", log.Ldate|log.Ltime|log.Lshortfile)
-	Error = log.New(os.Stderr, "ERROR: ", log.Ldate|log.Ltime|log.Lshortfile)
-	Debug = log.New(os.Stdout, "DEBUG: ", log.Ldate|log.Ltime)
+	fmt.Println("logger: ", helpers.Config.Logger)
+	Log = logrus.New()
+	if helpers.Config.Logger == "file" {
+		file, err := os.OpenFile("/var/log/idp/x-idp.log", os.O_APPEND|os.O_CREATE|os.O_RDWR, 0666)
+		if err != nil {
+			panic("Fatal: Could not open Logfile: " + err.Error())
+		}
+		Log.SetOutput(file)
+		fileEnabled = true
+	} else {
+		Log.SetOutput(os.Stdout)
+	}
+
+	formatter := new(logrus.TextFormatter)
+	formatter.TimestampFormat = "2006-01-02 15:04:05"
+	formatter.FullTimestamp = true
+	Log.SetFormatter(formatter)
+
+	if helpers.Config.Debug {
+		Log.SetLevel(logrus.WarnLevel)
+	} else {
+		Log.SetLevel(logrus.DebugLevel)
+	}
+}
+
+func Destroy() {
+	if fileEnabled {
+		file.Close()
+	}
 }

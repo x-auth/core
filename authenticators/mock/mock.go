@@ -40,7 +40,7 @@ func Login(username string, password string, config map[string]string) (models.P
 			PhoneNumber: "000000000",
 		}, true
 	} else {
-		logger.Warning.Println("Login failed, username or password false")
+		logger.Log.Warning("Login failed, username or password false")
 		return models.Profile{}, false
 	}
 }

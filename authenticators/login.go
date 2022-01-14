@@ -50,7 +50,7 @@ func Login(identifier string, password string, preflightRealm string) (models.Pr
 	// check if a valid split char is in the identifier
 	ok, splitChar := helpers.SliceContains(identifier, helpers.Config.SplitCharacters)
 	if !ok {
-		logger.Error.Println("No valid split character in identifier")
+		logger.Log.Error("No valid split character in identifier")
 		return models.Profile{}, false
 	}
 
@@ -69,7 +69,7 @@ func Login(identifier string, password string, preflightRealm string) (models.Pr
 
 	// quit if the input is wrong
 	if realmName != realmObj.Identifier {
-		logger.Error.Println("realm did not match preflight: " + realmName + " " + realmObj.Identifier)
+		logger.Log.Error("realm did not match preflight: " + realmName + " " + realmObj.Identifier)
 		return models.Profile{}, false
 	}
 
@@ -86,7 +86,7 @@ func Login(identifier string, password string, preflightRealm string) (models.Pr
 	} else if authenticator == "ldap" {
 		profile, ok := ldap.Login(username, password, getConfig(authenticator, preflightRealm))
 		if !ok {
-			logger.Warning.Println("Login failed, Username or password wrong")
+			logger.Log.Error("Login failed, Username or password wrong")
 			return models.Profile{}, false
 		}
 
