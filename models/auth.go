@@ -24,6 +24,8 @@
 
 package models
 
+import "encoding/json"
+
 type Profile struct {
 	Name        string
 	FamilyName  string
@@ -34,4 +36,8 @@ type Profile struct {
 	PhoneNumber string
 	Groups      []string
 	Remember    bool
+}
+
+func (p Profile) MarshalBinary() ([]byte, error) {
+	return json.Marshal(p)
 }

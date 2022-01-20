@@ -57,6 +57,8 @@ type conf struct {
 	SplitCharacters []string        `yaml:"split_characters"`
 	Authenticators  []authenticator `yaml:"authenticators"`
 	Realms          []Realm         `yaml:"realms"`
+	RedisAddr       string          `yaml:"redis_addr"`
+	RedisPassword   string          `yaml:"redis_password"`
 }
 
 var Config conf

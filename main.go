@@ -41,6 +41,9 @@ func main() {
 	logger.Init()
 	defer logger.Destroy()
 
+	// set up redis
+	helpers.InitRedis()
+
 	// init hydra
 	// TODO: Tell hydra that we only support scopes defined in mappers.go
 	err := helpers.InitHydra()

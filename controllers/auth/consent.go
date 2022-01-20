@@ -1,6 +1,8 @@
 package auth
 
 import (
+	"context"
+	"encoding/json"
 	"github.com/ory/hydra-client-go/client/admin"
 	"github.com/ory/hydra-client-go/models"
 	"net/http"
@@ -54,6 +56,19 @@ func Consent(w http.ResponseWriter, request *http.Request) {
 		parsedProfile = t
 	}
 
+	if len(parsedProfile) == 0 {
+		redisCtx := context.Background()
+		logger.Log.Debug(consentGetResp.GetPayload().Subject)
+		val, err := helpers.RDB.Get(redisCtx, consentGetResp.GetPayload().Subject).Result()
+		err = json.Unmarshal([]byte(val), &parsedProfile)
+		if err != nil {
+			helpers.Error(w, 500, err.Error())
+			return
+		}
+	}
+
+	rememberMe := parsedProfile["Remember"].(bool)
+
 	IDToken := make(map[string]interface{})
 	for _, claim := range claims {
 		IDToken[helpers.ToSnakeCase(claim)] = parsedProfile[claim].(string)
@@ -67,7 +82,7 @@ func Consent(w http.ResponseWriter, request *http.Request) {
 	consentAcceptBody := &models.AcceptConsentRequest{
 		GrantAccessTokenAudience: consentGetResp.GetPayload().RequestedAccessTokenAudience,
 		GrantScope:               grantScope,
-		Remember:                 false,
+		Remember:                 rememberMe,
 		Session:                  session,
 	}
 
