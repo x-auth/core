@@ -78,7 +78,7 @@ func Render(w http.ResponseWriter, lang string, file string, basefile string, da
 		Controller interface{}
 		BasePath   string
 		Texts      map[string]string
-	}{data.Controller, data.BasePath, locale}
+	}{data.Controller, Config.BasePath, locale}
 
 	data.BasePath = Config.BasePath
 	if basefile == "" {
