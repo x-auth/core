@@ -27,8 +27,11 @@ package helpers
 import (
 	"encoding/json"
 	"fmt"
+	"golang.org/x/text/language"
+	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 	"text/template"
 )
@@ -46,17 +49,47 @@ func mainLang(lang string) string {
 	}
 }
 
+func getLanguage(lang string) language.Base {
+	preferred, _, _ := language.ParseAcceptLanguage(lang)
+	matcher := language.NewMatcher([]language.Tag{
+		language.English,
+		language.German,
+	})
+	code, _, _ := matcher.Match(preferred[0])
+	base, _ := code.Base()
+	return base
+}
+
 func Render(w http.ResponseWriter, lang string, file string, basefile string, data TemplateCtx) {
+	localeFile, err := os.Open("locales/" + getLanguage(lang).String() + ".json")
+	if err != nil {
+		log.Println(err)
+	}
+	defer localeFile.Close()
+
+	var locale map[string]string
+	byteValue, _ := ioutil.ReadAll(localeFile)
+	err = json.Unmarshal(byteValue, &locale)
+	if err != nil {
+		log.Println(err)
+	}
+
+	fullData := struct {
+		Controller interface{}
+		BasePath   string
+		Texts      map[string]string
+	}{data.Controller, data.BasePath, locale}
+
 	data.BasePath = Config.BasePath
 	if basefile == "" {
-		tmpl := template.Must(template.ParseFiles("templates/" + mainLang(lang) + "/" + file))
-		err := tmpl.Execute(w, data)
+		tmpl := template.Must(template.ParseFiles("templates/" + file))
+		err := tmpl.Execute(w, fullData)
 		if err != nil {
 			log.Println(err)
 		}
 	} else {
-		tmpl := template.Must(template.ParseFiles("templates/"+mainLang(lang)+"/"+file, "templates/"+basefile))
-		err := tmpl.ExecuteTemplate(w, "base", data)
+		tmpl := template.Must(template.ParseFiles("templates/"+file, "templates/"+basefile))
+		err := tmpl.ExecuteTemplate(w, "base", fullData)
 		if err != nil {
 			fmt.Println(err)
 		}

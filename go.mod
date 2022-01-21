@@ -10,5 +10,6 @@ require (
 	github.com/gorilla/securecookie v1.1.1
 	github.com/ory/hydra-client-go v1.10.3
 	github.com/sirupsen/logrus v1.4.2
+	golang.org/x/text v0.3.6 // indirect
 	gopkg.in/yaml.v2 v2.4.0
 )

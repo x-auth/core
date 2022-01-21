@@ -1,0 +1,8 @@
+{
+  "Identifier": "Benutzerkennung",
+  "Password": "Passwort",
+  "Remember": "Eingeloggt bleiben",
+  "Login": "einloggen",
+  "AllowAccess": "Zugriff erlauben",
+  "CredentialsWrong": "Benutzername oder Passwort falsch"
+}

@@ -1,0 +1,8 @@
+{
+  "Identifier": "User identifier",
+  "Password": "Password",
+  "Remember": "remember me",
+  "Login": "login",
+  "AllowAccess": "allow Access",
+  "CredentialsWrong": "Username or password wrong"
+}
