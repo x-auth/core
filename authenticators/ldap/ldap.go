@@ -51,6 +51,7 @@ func Login(username string, password string, config map[string]string) (models.P
 	}
 
 	// check if ssl/tls cert verification should be skipped
+	logger.Log.Debug("verify:", config["skip_verify"])
 	var conn *ldap3.Conn
 	skipVerify, err := strconv.ParseBool(config["skip_verify"])
 	if err != nil {

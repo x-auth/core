@@ -76,7 +76,7 @@ func Preflight(w http.ResponseWriter, request *http.Request) {
 	}
 	for _, realm := range helpers.Config.Realms {
 		if realm.Default {
-			loginRedir(w, request, realm.Identifier)
+			loginRedir(w, request, realm.Name)
 			return
 		}
 	}

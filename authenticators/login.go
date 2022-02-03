@@ -65,6 +65,7 @@ func Login(identifier string, password string, preflightRealm string) (models.Pr
 			realmObj = realm
 		}
 	}
+	logger.Log.Info("realm:", realmObj.Name)
 
 	// quit if the input is wrong
 	//if realmName != realmObj.Identifier || realmObj.Default {
@@ -83,6 +84,7 @@ func Login(identifier string, password string, preflightRealm string) (models.Pr
 	if authenticator == "mock" {
 		return mock.Login(identifier, password, getConfig(authenticator, preflightRealm))
 	} else if authenticator == "ldap" {
+		logger.Log.Debug(getConfig(authenticator, preflightRealm))
 		profile, ok := ldap.Login(identifier, password, getConfig(authenticator, preflightRealm))
 		if !ok {
 			logger.Log.Error("Login failed, Username or password wrong")
