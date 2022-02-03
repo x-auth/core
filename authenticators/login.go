@@ -25,7 +25,6 @@
 package authenticators
 
 import (
-	"strings"
 	"x-net.at/idp/authenticators/ldap"
 	"x-net.at/idp/authenticators/mock"
 	"x-net.at/idp/helpers"
@@ -47,17 +46,17 @@ func getConfig(authenticator string, realmId string) map[string]string {
 }
 
 func Login(identifier string, password string, preflightRealm string) (models.Profile, bool) {
-	// check if a valid split char is in the identifier
-	ok, splitChar := helpers.SliceContains(identifier, helpers.Config.SplitCharacters)
-	if !ok {
-		logger.Log.Error("No valid split character in identifier")
-		return models.Profile{}, false
-	}
-
-	// split the identifier in username and realm
-	idSlice := strings.Split(identifier, splitChar)
-	username := identifier
-	realmName := idSlice[1]
+	//// check if a valid split char is in the identifier
+	//ok, splitChar := helpers.SliceContains(identifier, helpers.Config.SplitCharacters)
+	//if !ok {
+	//	logger.Log.Error("No valid split character in identifier")
+	//	return models.Profile{}, false
+	//}
+	//
+	//// split the identifier in username and realm
+	//idSlice := strings.Split(identifier, splitChar)
+	//username := identifier
+	//realmName := idSlice[1]
 
 	// get the realm and autheticator
 	var realmObj helpers.Realm
@@ -68,10 +67,10 @@ func Login(identifier string, password string, preflightRealm string) (models.Pr
 	}
 
 	// quit if the input is wrong
-	if realmName != realmObj.Identifier {
-		logger.Log.Error("realm did not match preflight: " + realmName + " " + realmObj.Identifier)
-		return models.Profile{}, false
-	}
+	//if realmName != realmObj.Identifier || realmObj.Default {
+	//	logger.Log.Error("realm did not match preflight: " + realmName + " " + realmObj.Identifier)
+	//	return models.Profile{}, false
+	//}
 
 	var authenticator string
 	for _, auth := range helpers.Config.Authenticators {
@@ -82,9 +81,9 @@ func Login(identifier string, password string, preflightRealm string) (models.Pr
 
 	// authenticate using the right authenticator
 	if authenticator == "mock" {
-		return mock.Login(username, password, getConfig(authenticator, preflightRealm))
+		return mock.Login(identifier, password, getConfig(authenticator, preflightRealm))
 	} else if authenticator == "ldap" {
-		profile, ok := ldap.Login(username, password, getConfig(authenticator, preflightRealm))
+		profile, ok := ldap.Login(identifier, password, getConfig(authenticator, preflightRealm))
 		if !ok {
 			logger.Log.Error("Login failed, Username or password wrong")
 			return models.Profile{}, false
