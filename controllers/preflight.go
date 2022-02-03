@@ -55,32 +55,31 @@ func Preflight(w http.ResponseWriter, request *http.Request) {
 	ok, splitChar := helpers.SliceContains(request.FormValue("email"), helpers.Config.SplitCharacters)
 
 	if !ok {
-		// no valid split char, try the default realm
-		for _, realm := range helpers.Config.Realms {
-			if realm.Default {
-				// redirect to the default authenticator login
-				loginRedir(w, request, realm.Identifier)
-				return
-			}
-		}
-		helpers.Error(w, 400, "No default realm found")
+		helpers.Error(w, 400, "Identifier contains no split character")
 		return
-	} else {
-		// split char is good
-		identifierRealm := strings.Split(request.FormValue("email"), splitChar)[1]
+	}
 
-		for _, realm := range helpers.Config.Realms {
-			// check if the realm in the identifier matches a configured realm
-			if realm.Identifier == identifierRealm {
-				for _, authCfg := range helpers.Config.Authenticators {
-					if authCfg.Name == realm.Authenticator {
-						// redirect to the evaluated authenticator
-						loginRedir(w, request, realm.Name)
-						return
-					}
+	// split char is good
+	identifierRealm := strings.Split(request.FormValue("email"), splitChar)[1]
+
+	for _, realm := range helpers.Config.Realms {
+		// check if the realm in the identifier matches a configured realm
+		if realm.Identifier == identifierRealm {
+			for _, authCfg := range helpers.Config.Authenticators {
+				if authCfg.Name == realm.Authenticator {
+					// redirect to the evaluated authenticator
+					loginRedir(w, request, realm.Name)
+					return
 				}
 			}
 		}
 	}
-	helpers.Error(w, 400, "No valid realm found")
+	for _, realm := range helpers.Config.Realms {
+		if realm.Default {
+			loginRedir(w, request, realm.Identifier)
+			return
+		}
+	}
+
+	helpers.Error(w, 400, "no valid realm found")
 }
