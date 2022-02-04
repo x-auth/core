@@ -29,17 +29,21 @@ import (
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
+	"x-net.at/idp/authenticators"
 	"x-net.at/idp/helpers"
 	"x-net.at/idp/logger"
 )
 
 func main() {
-	// load the config
-	helpers.LoadConfig()
-
 	// set up logging
 	logger.Init()
 	defer logger.Destroy()
+
+	// load the config
+	helpers.LoadConfig()
+
+	// load the plugin config
+	authenticators.Init()
 
 	// set up redis
 	helpers.InitRedis()
