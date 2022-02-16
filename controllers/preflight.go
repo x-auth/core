@@ -27,6 +27,7 @@ package controllers
 import (
 	"net/http"
 	"strings"
+	"x-net.at/idp/authenticators"
 	"x-net.at/idp/helpers"
 )
 
@@ -65,8 +66,8 @@ func Preflight(w http.ResponseWriter, request *http.Request) {
 	for _, realm := range helpers.Config.Realms {
 		// check if the realm in the identifier matches a configured realm
 		if realm.Identifier == identifierRealm {
-			for _, authCfg := range helpers.Config.Authenticators {
-				if authCfg.Name == realm.Authenticator {
+			for key, _ := range authenticators.Authenticators {
+				if key == realm.Authenticator {
 					// redirect to the evaluated authenticator
 					loginRedir(w, request, realm.Name)
 					return

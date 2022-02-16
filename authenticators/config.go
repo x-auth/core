@@ -31,3 +31,14 @@ func LoadAuthConfig() authConfig {
 
 	return cfg
 }
+
+func ValidateRealm(authenticatorName string) bool {
+	cfg := LoadAuthConfig()
+	for _, configured := range cfg.Authenticators {
+		if configured.Name == authenticatorName {
+			return true
+		}
+	}
+
+	return false
+}

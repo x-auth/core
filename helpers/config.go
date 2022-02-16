@@ -32,38 +32,31 @@ import (
 )
 
 type Realm struct {
-	Name          string            `yaml:"name"`
-	Identifier    string            `yaml:"identifier"`
-	Authenticator string            `yaml:"authenticator"`
-	Default       bool              `yaml:"default"`
-	SkipConsent   bool              `yaml:"skip_consent"`
-	Config        map[string]string `yaml:"config,omitempty"`
-}
-
-type authenticator struct {
-	Type   string            `yaml:"type"`
-	Name   string            `yaml:"name"`
-	Config map[string]string `yaml:"config"`
+	Name          string `yaml:"name"`
+	Identifier    string `yaml:"identifier"`
+	Authenticator string `yaml:"authenticator"`
+	Default       bool   `yaml:"default"`
+	SkipConsent   bool   `yaml:"skip_consent"`
 }
 
 type conf struct {
 	Debug           bool
-	Host            string          `yaml:"host"`
-	BasePath        string          `yaml:"base_path"`
-	HydraURL        string          `yaml:"hydra_url"`
-	KratosURL       string          `yaml:"kratos_url"`
-	RememberFor     int64           `yaml:"remember_for"`
-	Logger          string          `yaml:"logger"`
-	SplitCharacters []string        `yaml:"split_characters"`
-	Authenticators  []authenticator `yaml:"authenticators"`
-	Realms          []Realm         `yaml:"realms"`
-	RedisAddr       string          `yaml:"redis_addr"`
-	RedisPassword   string          `yaml:"redis_password"`
+	Host            string   `yaml:"host"`
+	BasePath        string   `yaml:"base_path"`
+	HydraURL        string   `yaml:"hydra_url"`
+	KratosURL       string   `yaml:"kratos_url"`
+	RememberFor     int64    `yaml:"remember_for"`
+	Logger          string   `yaml:"logger"`
+	SplitCharacters []string `yaml:"split_characters"`
+	Realms          []Realm  `yaml:"realms"`
+	RedisAddr       string   `yaml:"redis_addr"`
+	RedisPassword   string   `yaml:"redis_password"`
 }
 
 var Config conf
 
-func LoadConfig() {
+// TODO: check if authenticators configured in realms are valid!
+func LoadConfig() conf {
 	// load the config
 	yamlFile, err := ioutil.ReadFile("/etc/idp/config.yaml")
 	if err != nil {
@@ -86,4 +79,6 @@ func LoadConfig() {
 			log.Fatal("Error: " + splitChar + " is not allowed as a split character")
 		}
 	}
+
+	return Config
 }

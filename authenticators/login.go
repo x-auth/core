@@ -8,7 +8,7 @@ import (
 	"x-net.at/idp/logger"
 )
 
-var authenticators = make(map[string]plugins.AuthPlugin)
+var Authenticators = make(map[string]plugins.AuthPlugin)
 
 func Init() {
 	cfg := LoadAuthConfig()
@@ -29,7 +29,7 @@ func Init() {
 		}
 
 		logger.Log.Debug("cfg:", authenticator.Config)
-		authenticators[authenticator.Name] = constructor(authenticator.Config)
+		Authenticators[authenticator.Name] = constructor(authenticator.Config)
 	}
 }
 
@@ -41,6 +41,7 @@ func Login(username string, password string, preflightRealm string) (models.Prof
 		}
 	}
 
-	authenticator := authenticators[realmObj.Authenticator]
+	authenticator := Authenticators[realmObj.Authenticator]
+	logger.Log.Debug("choosen authenticator: ", realmObj.Authenticator)
 	return authenticator.Login(username, password)
 }

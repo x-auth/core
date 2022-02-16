@@ -24,6 +24,7 @@
 
 package main
 
+import "C"
 import (
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
@@ -40,7 +41,12 @@ func main() {
 	defer logger.Destroy()
 
 	// load the config
-	helpers.LoadConfig()
+	conf := helpers.LoadConfig()
+	for _, realm := range conf.Realms {
+		if !authenticators.ValidateRealm(realm.Authenticator) {
+			logger.Log.Fatal("realm \"", realm.Name, "\" contains non existent authenticator \"", realm.Authenticator, "\"")
+		}
+	}
 
 	// load the plugin config
 	authenticators.Init()
