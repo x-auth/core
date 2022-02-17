@@ -9,7 +9,7 @@ hydra_version = v1.9.0
 
 build:
 	mkdir -p bin
-	go build -o ./bin/idp
+	go build -o ./bin/idp .
 
 install:
 	mkdir -p $(workingDir)
