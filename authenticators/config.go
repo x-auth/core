@@ -19,7 +19,7 @@ type authConfig struct {
 
 func LoadAuthConfig() authConfig {
 	var cfg authConfig
-	yamlFile, err := ioutil.ReadFile("/etc/x-idp/plugins.yaml")
+	yamlFile, err := ioutil.ReadFile("/etc/x-auth/plugins.yaml")
 	if err != nil {
 		logger.Log.Fatal(err)
 	}

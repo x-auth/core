@@ -23,13 +23,18 @@ func Init() {
 			logger.Log.Fatal(err)
 		}
 
-		constructor, ok := sym.(func(map[string]string) plugins.AuthPlugin)
+		constructor, ok := sym.(func(map[string]string) (plugins.AuthPlugin, error))
 		if !ok {
 			logger.Log.Fatal("No plugin constructor found")
 		}
 
 		logger.Log.Debug("cfg:", authenticator.Config)
-		Authenticators[authenticator.Name] = constructor(authenticator.Config)
+		Authenticators[authenticator.Name], err = constructor(authenticator.Config)
+		if err != nil {
+			logger.Log.Fatal(err)
+		}
+
+		logger.Log.Info("Plugin \"", authenticator.Name, "\" loaded")
 	}
 }
 
@@ -42,5 +47,12 @@ func Login(username string, password string, preflightRealm string) (models.Prof
 	}
 
 	authenticator := Authenticators[realmObj.Authenticator]
-	return authenticator.Login(username, password)
+	profile, err := authenticator.Login(username, password)
+
+	if err != nil {
+		logger.Log.Error(err)
+		return models.Profile{}, false
+	}
+
+	return profile, true
 }

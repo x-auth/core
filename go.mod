@@ -19,7 +19,7 @@ require (
 	github.com/mitchellh/mapstructure v1.4.3 // indirect
 	github.com/ory/hydra-client-go v1.10.6
 	github.com/sirupsen/logrus v1.8.1
-	github.com/x-auth/common v0.0.0-20220216170134-e062fda2a33d
+	github.com/x-auth/common v0.0.0-20220217075226-c667ca643c4a
 	go.mongodb.org/mongo-driver v1.8.3 // indirect
 	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd // indirect
 	golang.org/x/sys v0.0.0-20220204135822-1c1b9b1eba6a // indirect

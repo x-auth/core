@@ -55,10 +55,9 @@ type conf struct {
 
 var Config conf
 
-// TODO: check if authenticators configured in realms are valid!
 func LoadConfig() conf {
 	// load the config
-	yamlFile, err := ioutil.ReadFile("/etc/idp/config.yaml")
+	yamlFile, err := ioutil.ReadFile("/etc/x-auth/config.yaml")
 	if err != nil {
 		log.Fatal(err)
 	}
