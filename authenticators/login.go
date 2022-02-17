@@ -42,6 +42,5 @@ func Login(username string, password string, preflightRealm string) (models.Prof
 	}
 
 	authenticator := Authenticators[realmObj.Authenticator]
-	logger.Log.Debug("choosen authenticator: ", realmObj.Authenticator)
 	return authenticator.Login(username, password)
 }
