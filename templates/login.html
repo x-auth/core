@@ -8,6 +8,18 @@
 
   <div class="row sm-gutters">
     <div class="col-12">
+      {{if .Controller.Restarted}}
+      <p>
+        {{.Texts.PreflightInfo}}
+      </p>
+      {{end}}
+      {{if ne .Controller.Realm ""}}
+      <div style="margin-bottom: 1em">
+        <b>Realm:</b> X-NET
+        <br>
+        <small><a style="margin-right: 3em" href="{{.BasePath}}/?login_challenge={{.Controller.Challenge}}&restarted=1">wechseln</a></small>
+      </div>
+      {{end}}
       <div class="form-group">
         <label class="label" for="email">
           {{.Texts.Identifier}}

@@ -4,5 +4,7 @@
   "Remember": "Eingeloggt bleiben",
   "Login": "einloggen",
   "AllowAccess": "Zugriff erlauben",
-  "CredentialsWrong": "Benutzername oder Passwort falsch"
+  "CredentialsWrong": "Benutzername oder Passwort falsch",
+  "Restart": "Neustart",
+  "PreflightInfo": "Bitte achten sie darauf Ihre Benutzerkennung richtig einzugeben. Nur so kann das system die richtige Oranisation auswählen!"
 }

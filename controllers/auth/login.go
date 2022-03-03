@@ -44,7 +44,7 @@ func Login(w http.ResponseWriter, request *http.Request) {
 	profile, authOk := authenticators.Login(request.FormValue("email"), request.FormValue("password"), realm)
 	if !authOk {
 		logger.Log.Info("login failed")
-		helpers.Render(w, request.Header.Get("Accept-Language"), "login.html", "base.html", helpers.TemplateCtx{Controller: LoginData{csrf.TemplateField(request), request.FormValue("login-challenge"), true, "username or password is wrong"}})
+		helpers.Render(w, request.Header.Get("Accept-Language"), "login.html", "base.html", helpers.TemplateCtx{Controller: LoginData{csrf.TemplateField(request), request.FormValue("login-challenge"), true, "username or password is wrong", realm, false}})
 		return
 	}
 

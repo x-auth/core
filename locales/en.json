@@ -4,5 +4,7 @@
   "Remember": "remember me",
   "Login": "login",
   "AllowAccess": "allow Access",
-  "CredentialsWrong": "Username or password wrong"
+  "CredentialsWrong": "Username or password wrong",
+  "Restart": "restart login",
+  "PreflightInfo": "Please be careful to enter your Identifier correctly. It is needed for determining the correct realm!"
 }

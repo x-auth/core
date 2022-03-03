@@ -14,6 +14,8 @@ type LoginData struct {
 	Challenge string
 	Error     bool
 	Message   string
+	Realm     string
+	Restarted bool
 }
 
 func LoginForm(w http.ResponseWriter, request *http.Request) {
@@ -34,6 +36,12 @@ func LoginForm(w http.ResponseWriter, request *http.Request) {
 	if !ok || len(challenge_slice) < 1 {
 		helpers.Error(w, 400, "Expected a login challenge but received none")
 		return
+	}
+
+	// check if user restarted the flow
+	restarted := false
+	if len(request.URL.Query()["restarted"]) > 0 {
+		restarted = request.URL.Query()["restarted"][0] == "1"
 	}
 
 	// use Hydra Admin to get the login challenge info
@@ -73,5 +81,5 @@ func LoginForm(w http.ResponseWriter, request *http.Request) {
 		http.Redirect(w, request, *respLoginAccept.GetPayload().RedirectTo, http.StatusFound)
 		return
 	}
-	helpers.Render(w, request.Header.Get("Accept-Language"), "login.html", "base.html", helpers.TemplateCtx{Controller: LoginData{csrf.TemplateField(request), challenge_slice[0], false, ""}})
+	helpers.Render(w, request.Header.Get("Accept-Language"), "login.html", "base.html", helpers.TemplateCtx{Controller: LoginData{csrf.TemplateField(request), challenge_slice[0], false, "", "", restarted}})
 }
